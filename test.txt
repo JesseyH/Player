@@ -1,0 +1,10 @@
+::CELLS::	5
+::BUTTONS::	5
+This is line 1
+This is line 2
+::CREAD::	warn	THIS IS WARNING
+::ASK::	Please press 1, 2, 3, 4, or 5.
+::COMMAND::	1	2	3	4	5
+::ACTION::	READ	PLAY	Continue	REPEAT	RESTRAT
+
+This is line 3
