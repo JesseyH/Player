@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  */
 public class Player {
 	static String lastRead;
+
 	public static void main(String[] args) throws InterruptedException {
 		BufferedReader fileReader = null;
 		Simulator simulator = null;
@@ -55,6 +56,7 @@ public class Player {
 
 class playerController {
 
+	static boolean aaa = true;
 	public static void initActionListner(int buttonID, String command, Simulator simulator, String componentA) {
 		System.out.println(buttonID);
 		simulator.getButton(buttonID).addActionListener(new ActionListener() {
@@ -72,7 +74,7 @@ class playerController {
 				break;
 				case "REPEATB": readText(componentA);
 				break;
-				case "REPEATC": playSound(componentA);
+				case "REPEATC": repeatSub(Player.lastRead);
 				break;
 				}
 			}
@@ -80,7 +82,7 @@ class playerController {
 	}
 
 	public static void readText(String textToRead) {
-		Speak.textToSpeech(textToRead);
+	//	Speak.textToSpeech(textToRead);
 	}
 
 	public static void playSound(String filepath) {
