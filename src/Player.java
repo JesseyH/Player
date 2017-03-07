@@ -29,13 +29,13 @@ public class Player {
 							for (int i=1; i<subStrings.length;i++) {
 								subStringsB = subStrings[i].split("=");
 								int buttonID = Integer.parseInt(subStringsB[0].replaceAll("[^0-9]", "")) - 1;
-								playerController.initActionListner(buttonID, subStringsB[1], simulator, (subStringsB.length>2) ? subStringsB[2]:null);
+								initActionListner(buttonID, subStringsB[1], simulator, (subStringsB.length>2) ? subStringsB[2]:null);
 							}
 						} else if(subStrings[0].contains("<<CELLS>>")) {
 							simulator = new Simulator(Integer.parseInt(subStrings[1]), Integer.parseInt(subStrings[3]));
 						}
 					} else {
-						playerController.readText(line);
+						readText(line);
 					}
 					lastRead=line;
 				}
@@ -52,11 +52,7 @@ public class Player {
 			}
 		}
 	}
-}
-
-class playerController {
-
-	static boolean aaa = true;
+	
 	public static void initActionListner(int buttonID, String command, Simulator simulator, String componentA) {
 		System.out.println(buttonID);
 		simulator.getButton(buttonID).addActionListener(new ActionListener() {
@@ -83,6 +79,7 @@ class playerController {
 
 	public static void readText(String textToRead) {
 	//	Speak.textToSpeech(textToRead);
+		System.out.println(textToRead);
 	}
 
 	public static void playSound(String filepath) {
@@ -90,14 +87,16 @@ class playerController {
 	}
 
 	public static void repeatLast(String textToRepeat) {
-		Speak.textToSpeech(textToRepeat);
+		//Speak.textToSpeech(textToRepeat);
+		System.out.println(textToRepeat);
 	}
 
 	public static void repeatSub(String textToRepeat) {
 		String textToRepeatTemp = textToRepeat;
 		while(textToRepeatTemp.indexOf("<")>0) {
 			String repeat = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<") + 1, textToRepeatTemp.indexOf(">"));
-			Speak.textToSpeech(repeat);
+			//Speak.textToSpeech(repeat);
+			System.out.println(repeat);
 			textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">") + 1, textToRepeatTemp.length());		
 		}
 	}
