@@ -67,10 +67,10 @@ public class Speak {
 	}
 	
 	//Example cases
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		Speak.playSound("resources/beep.wav");
 		Speak.textToSpeech("It's Alive");
-	}
+	}*/
 }
 
 
