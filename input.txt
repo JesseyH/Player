@@ -12,4 +12,6 @@ This is an exemplar interaction, Please clock button 1 will play a sound; clicki
 
 <<QUIZ>>	CORRECT ANSWER=C	TRIALS=5	OPTION 0=A	OPTION 1=B	OPTION 2=C	OPTION 3=D
 
+<<BRAILLE=2=A>>
+
 This is <line 3>
