@@ -2,55 +2,47 @@
 
 Title, Adventure on the High Seas.
 
-Narrator (Z) says, 
-Welcome! Today we set out on the high seas with Captain A, First Mate B, and their crew. I’m skipper Z and I’ll be here during the journey to describe everything. I’m just joining the crew today as well, so I’ll be learning along with you here. Let’s meet the Captain A and the First Mate B!
+Narrator (Z) says, Welcome! Today we set out on the high seas with Captain A, First Mate B, and their crew. Iï¿½m skipper Z and Iï¿½ll be here during the journey to describe everything. Iï¿½m just joining the crew today as well, so Iï¿½ll be learning along with you here. Letï¿½s meet the Captain A and the First Mate B! Captain A says, Ahoy skipper Z! Iï¿½m Captain A. Iï¿½m excited for some new crew members for this journey. We hope to find a magnificent treasure at the end of it! Has First Mate B introduced himself? First Mate B says, Not yet, Captain A! Iï¿½m First Mate B, first in command to Captain A. Weï¿½re setting off on our journey now, so do you understand our names? Press button 1 to continue, button 2 to repeat.
+
+<<COMMAND>>	BUTTON 0=CONTINUE	BUTTON 1=REPEAT
 
 Captain A says,
-Ahoy skipper Z! I’m Captain A. I’m excited for some new crew members for this journey. We hope to find a magnificent treasure at the end of it! Has First Mate B introduced himself?
-
-First Mate B says, 
-Not yet, Captain A! I’m First Mate B, first in command to Captain A. We’re setting off on our journey now, so do you understand our names? Press button 1 to continue, button 2 to repeat.
-
-
-<<COMMAND>>	BUTTON 0=CONTINUE	BUTTON 1=REPEATC
-
-Captain A says,
-Alright, then we’re off!
+Alright, then weï¿½re off!
 
 Skipper Z says,
-Wow, the air feels so soft and cool, I can smell the salt! Do you hear those waves? <<SFX=./resources/beep.wav>> Hold on, what’s that sound, down in the water? <<SFX=./resources/beep.wav>>
+Wow, the air feels so soft and cool, I can smell the salt! Do you hear those waves? <<SFX=./resources/beep.wav>> Hold on, whatï¿½s that sound, down in the water? <<SFX=./resources/beep.wav>>
 
 MerKing E says,
 Hello, sailors! I am the MerKing E, lord of the seven seas! This is my right hand man, Merman K. We come to you with a request
 
 Merman K says,
-You see, MerKing E’s daughter, the Mermaid P, has been captured by an evil pirate crew, and we need your help to get her back. Whaddya say?
+You see, MerKing Eï¿½s daughter, the Mermaid P, has been captured by an evil pirate crew, and we need your help to get her back. Whaddya say?
 
 First Mate B says,
-Well, let’s get to it. We will need to fight them using what we know now of the Braille alphabet. So, how do you feel about our names up to now? There’s A, B, E, K, and P. Got it?
+Well, letï¿½s get to it. We will need to fight them using what we know now of the Braille alphabet. So, how do you feel about our names up to now? Thereï¿½s "A", "B", "E", "K", and "P". Got it?
 Press <button 1> to continue, <button 2> to repeat the names.
 
-<<COMMAND>>	BUTTON 0=CONTINUE	BUTTON 1=REPEATB=There’s A, B, E, K, and P. Got it?
+<<COMMAND>>	BUTTON 0=CONTINUE	BUTTON 1=REPEATB=Thereï¿½s "A", "B", "E", "K", and "P". Got it?
 
 Merman K says,
 Thank you, kind pirates! Set sail for the evil pirates, and rescue the Mermaid P!
 
 Skipper Z says,
-Off we go, then! The sails have been lowered <<SFX=./resources/beep.wav>> and the ship’s started to skip over the waves <<SFX=./resources/beep.wav>>!
+Off we go, then! The sails have been lowered <<SFX=./resources/beep.wav>> and the shipï¿½s started to skip over the waves <<SFX=./resources/beep.wav>>!
 
 First Mate B says,
-But there’s something in our way! What is that?
+But thereï¿½s something in our way! What is that?
 
 A Whale sings,
 Meeeeeeeeeu.
 
-Captain A
+Captain A says,
 But none of us speak whale!
 
-Skipper Z
-MerKing E, don’t you speak the language of the sea?
+Skipper Z says,
+MerKing E, donï¿½t you speak the language of the sea?
 
-MerKing E
+MerKing E says,
 Of course! Help me out with this, will you, sailor ?
 Press <button 1> if letter A is displayed, or <button 2> if letter Z is displayed.
 <<BRAILLE=0=A>>
@@ -60,6 +52,7 @@ Merman K says,
 Good job! You did it!
 
 THe Whale sings,
-Meeeeeeeeeeeeeeeeeeu… [leaving]
+Meeeeeeeeeeeeeeeeeeuï¿½ 
+As it leaves
 
 And so on...
