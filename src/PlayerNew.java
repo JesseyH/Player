@@ -56,7 +56,12 @@ public class PlayerNew {
 		} else if (split[0].equals("<DISPLAY>")) {
 			display(s);
 		} else {
-			new Exception("COMMAND WAS NOT FOUND!");
+			try {
+				throw (new Exception("COMMAND WAS NOT FOUND!"));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			next();
 		}
 	}
