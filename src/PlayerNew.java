@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 /**This class reads a Story file and displays it to a Braille Simulator
  * <p>
- * The main method 
+ * The main method reads the story file and stores it to an Arraylist of 
+ * type string then it initializes the simulator with the size information
+ * obtained from the story file. It then runs the story.
  * @author Group 6
  *
  */
@@ -16,6 +18,10 @@ public class PlayerNew {
 	protected static int index = 1;
 	private static OptionHandler l = new OptionHandler();
 	
+	/**
+	 * loads the story into an ArrayList, initializes the simulator and runs the story.
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		System.out.println("Please enter the file you would like to load (E.g input.txt):");
 		Scanner scan = new Scanner(System.in);	//Create scanner object.
@@ -27,6 +33,7 @@ public class PlayerNew {
 		getCommand(getLines().get(index));
 
 	}
+	
 	/**
 	 * 
 	 * @param s
