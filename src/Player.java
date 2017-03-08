@@ -26,7 +26,7 @@ public class Player {
 
 		try {
 			/*
-			 * Open file for reading
+			 * Opens file for reading
 			 * Throws missing file exception
 			 */
 			fileReader = new BufferedReader(new FileReader(args[0])); 
@@ -39,7 +39,17 @@ public class Player {
 						subStrings = line.split("	"); // Splitting line by tab spaces
 
 						/*
-						 * Detecting keywords in line and performing corresponding computation. (i.e. COMMAND, SFX, CELLS, etc.)
+						 * Detecting keywords in line and performing corresponding computations:
+						 * 	<<COMMAND>> - Used in input for attaching action to buttons; each button-to-action command
+						 * 	is separated by tab. (i.e. <<COMMAND>>	BUTTON 0=PLAY=./sfc.wav; an action to PLAY sfx.wav is attached
+						 *  to BUTTON.
+						 *  <<QUIZ>> - Compares user answer (button click) with correct answer, and provide appropriate response.
+						 *  <<BRAILLE*>> is used for setting braille (no user interaction involved)
+						 *  	(i.e. <<BRAILLE=2=A>> sets braille cell 2 states to display character A)
+						 *  <<CELLS>> - Used for setting number buttons and cells in simulator
+						 *  <<SFX=*>> - Allows playing SFX without user interaction. (i.e. "Hello, can you hear the siren 
+						 *  	<<SFX=./siren.wav>>, can you?"; Program will read text and play sound accordingly)
+						 *  
 						 */
 						if(subStrings[0].contains("<<COMMAND>>")) {
 							for (int i=1; i<subStrings.length;i++) {
@@ -57,6 +67,9 @@ public class Player {
 								} else if (accessed && commandAction.get(buttonClicked)!=null) {
 									break;
 								} else {
+									/*
+									 * Putting main thread to sleep to wait for user input
+									 */
 									try {
 										Thread.sleep(100);
 									} catch (InterruptedException e) {
@@ -149,6 +162,11 @@ public class Player {
 			}
 		}
 	}
+	/*
+	 * Returns an array containing the components required to perform corresponding action
+	 * 	i.e. For the instruction--BUTTON 1=BRAILLE=3=B-- 3 and B will be stored as
+	 * 	components in an array with same order.
+	 */
 	public static String[] getComponents(String[] subString, int startValue) {
 		String[] components = new String[5];
 		for(;startValue<subString.length;startValue++) {
@@ -156,6 +174,20 @@ public class Player {
 		}	
 		return components;
 	}
+	
+	/*
+	 * 
+	 * Performs action based on instruction codes:
+	 * PLAY - players SFX file using path provided (i.e. BUTTON 0=PLAY=./resources/beep.wav)
+	 * CONTINUE - Wait for user to press button corresponding to CONTINUE instruction and continues to read next line
+	 * REPEAT - repeats the line that was just read
+	 * REPATB - repeats text provided after "REPEATB=". (i.e. REPEATB=HELLO WORLD; for this "HELLO WORLD will be repeated)
+	 * REPATC - repeats components of the last read line that are enclosed by <>;
+	 * 	i.e. REPEATC command on line - "Hello <WORLD> IS <COOL>" will repeat "WORLD" and "COOL"
+	 * BRAILLE - Used for setting the braille cells state. (i.e. BUTTON 1=BRAILLE=3=B; When button 1 is clicked
+	 * braille cell 3 will be set to display character B)
+	 * 
+	 */
 	public static void doAction(HashMap<Integer, String[]> commandAction) {
 		switch(commandAction.get(buttonClicked)[0]){
 		case "PLAY": {
@@ -189,24 +221,41 @@ public class Player {
 		}
 		}
 	}
+	
+	/*
+	 * Extracts button number as an integer from instruction (i.e. input to method - BUTTON 1; output - 1)
+	 */
 	public static int getButton(String str) {
 		return Integer.parseInt(str.replaceAll("[^0-9]", ""));
 	}
+	
+	/*
+	 * Reads string argument provided using FreeTTS
+	 */
 	public static void readText(String textToRead) {
 		//if (textToRead.length()>0) Speak.textToSpeech(textToRead);
 		if (textToRead.length()>0) System.out.println(textToRead);
 	}
-
+	
+	/*
+	 * Plays SFX located at the path provided to method
+	 */
 	public static void playSound(String filepath) {
 		//Speak.playSound(filepath);
 		System.out.println(filepath);
 	}
 
+	/*
+	 * Repeats the line that was just read by FreeTTS
+	 */
 	public static void repeatLast(String textToRepeat) {
 		//Speak.textToSpeech(textToRepeat);
 		System.out.println(textToRepeat);
 	}
 
+	/*
+	 * Repeats part of last line read enclosed within < > tags
+	 */
 	public static void repeatSub(String textToRepeat) {
 		String textToRepeatTemp = textToRepeat;
 		while(textToRepeatTemp.indexOf("<")>0) {
@@ -218,6 +267,11 @@ public class Player {
 	}
 }
 
+/*
+ * ActionListener for all the buttons
+ * Sets variable buttonClicked and accessed which is used for continuing paused main method
+ * 	and to perform action that user requested by clicking specific button.
+ */
 class PlayerB implements ActionListener {
 
 	@Override
