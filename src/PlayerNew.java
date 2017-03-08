@@ -54,7 +54,7 @@ public class PlayerNew {
 		} else if (split[0].equals("<OPTION>")) {
 			option(split[1]);
 		} else if (split[0].equals("<DISPLAY>")) {
-			display(s);
+			display(split[1]);
 		} else {
 			new Exception("COMMAND WAS NOT FOUND!");
 			next();
@@ -113,6 +113,7 @@ public class PlayerNew {
 	 * @param aString string to be displayed
 	 */
 	public static void display(String aString) {
+		System.out.println("STRING: " + aString);
 		simulator.displayString(aString);
 		next();
 	}
@@ -231,14 +232,14 @@ class OptionHandler implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String s = e.getActionCommand();
 		System.out.println(s);
-		if (s != "NULL") {
+		if (!s.equalsIgnoreCase("NULL")) {
 			PlayerNew.index = Integer.valueOf(s);
 			for (int i = 0;i < PlayerNew.buttons; i++){
 				PlayerNew.simulator.getButton(i).removeActionListener(PlayerNew.l);
 			}
 			PlayerNew.getCommand(PlayerNew.getLines().get(PlayerNew.index));
 		} else {
-			PlayerNew.tts("Not a Valid Option. Please Try again.");
+			Speak.textToSpeech("Not a Valid Option. Please Try again.");
 		}
 	}
 
