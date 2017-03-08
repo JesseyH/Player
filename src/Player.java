@@ -15,10 +15,10 @@ public class Player {
 	static String lastRead;
 	public static int buttonClicked;
 	public static boolean accessed = false;
+	static Simulator simulator = null; // Initializing Simulator instance
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		BufferedReader fileReader = null; // BufferedReader to read from file line by line
-		Simulator simulator = null; // Initializing Simulator instance
 		String line; // Variable "line" will be used for temporarily hold each line read from file
 		String[] subStrings, subStringsB; //subStrings is used for splitting string delimited by tab-space, subStringB by "="
 		PlayerB playerx = new PlayerB(); // Initializing action listener class instance
@@ -37,37 +37,47 @@ public class Player {
 				while((line = fileReader.readLine())!=null) {
 					if(Pattern.compile("<<.*>>").matcher(line).find()) { //Checking if line is contain command that requires addition work
 						subStrings = line.split("	"); // Splitting line by tab spaces
-						
+
 						/*
 						 * Detecting keywords in line and performing corresponding computation. (i.e. COMMAND, SFX, CELLS, etc.)
-						 * 						 */
+						 */
 						if(subStrings[0].contains("<<COMMAND>>")) {
 							for (int i=1; i<subStrings.length;i++) {
 								subStringsB = subStrings[i].split("="); // Splitting components of line by "="
-								
-								if (subStringsB.length>2) {
-									commandAction.put(getButton(subStringsB[0]), new String[] {subStringsB[1], subStringsB[2]});
-								} else {
-									commandAction.put(getButton(subStringsB[0]), new String[] {subStringsB[1]});
-								}								
+								commandAction.put(getButton(subStringsB[0]), getComponents(subStringsB,1));					
 							}	
 							/*
 							 * Checking and waiting for actionPerformed method to execute before continuing to next line
 							 */
-							while(!accessed) {
-								Thread.sleep(100);
+							while(true) {
+								if (accessed && commandAction.get(buttonClicked)==null) {
+									readText("No action associated with button"+buttonClicked+". Please try again!");
+									accessed = false;
+									continue;
+								} else if (accessed && commandAction.get(buttonClicked)!=null) {
+									break;
+								} else {
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {
+										System.out.println("Error occured while putting main thread to sleep");
+									}
+								}
 							}
 							/*
-							 * Performing action 
+							 * Performing respective action based on button clicked
 							 */
 							doAction(commandAction);
+							commandAction.clear();
+							accessed = false;
 						} else if(subStrings[0].contains("<<CELLS>>")) {
 							simulator = new Simulator(Integer.parseInt(subStrings[1]), Integer.parseInt(subStrings[3]));
 							for (int i=0; i<Integer.parseInt(subStrings[3]);i++) simulator.getButton(i).addActionListener(playerx);
 						} else if(subStrings[0].contains("<<SFX=")) {
 							String textToRepeatTemp = line;
 							while(textToRepeatTemp.indexOf("<<")>=0) {
-								String play = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<<SFX=") + 6, textToRepeatTemp.indexOf(">>"));
+								String play = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<<SFX=")
+										+ 6, textToRepeatTemp.indexOf(">>"));
 								try {
 									String read = textToRepeatTemp.substring(0, textToRepeatTemp.indexOf("<<SFX=") - 1);
 									readText(read);
@@ -78,11 +88,10 @@ public class Player {
 								textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">>") + 1, textToRepeatTemp.length());		
 							}
 						} else if(subStrings[0].contains("<<QUIZ>>")) {
-							commandAction.clear();
 							accessed = false;
 							int trials = 0, tries = 0;
 							for (int i=1; i<subStrings.length;i++) {
-								subStringsB = subStrings[i].split("=");		
+								subStringsB = subStrings[i].split("=");
 								if (i==1) {									
 									commandAction.put(-1, new String[] {subStringsB[1]});
 								} else if (i==2) {									
@@ -90,20 +99,28 @@ public class Player {
 								} else {												
 									commandAction.put(getButton(subStringsB[0]), new String[] {subStringsB[1]});
 								}
-
 							}
 							while(true) {
-								Thread.sleep(100);
-								if (accessed && commandAction.get(buttonClicked)[0].equals(commandAction.get(-1)[0])) {
-									readText("Correct");
-									break;
-								} else if (accessed)  {
-									if (trials<0 || trials<=tries) {
-										readText("You were unable to guess the correct answer");
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									System.err.println("Error occured while putting main thread to sleep");
+								}
+								try {
+									if (accessed && commandAction.get(buttonClicked)[0].equals(commandAction.get(-1)[0])) {
+										readText("Your answer is correct");
 										break;
+									} else if (accessed)  {
+										if (trials>0 && trials<=tries) {
+											readText("You were unable to guess the correct answer");
+											break;
+										}
+										readText("Please try again");
+										tries++;
+										accessed=false;
 									}
-									readText("Try Again");
-									tries++;
+								} catch (NullPointerException e) {
+									readText("There is no action associated with this button");
 									accessed=false;
 								}
 							}
@@ -112,7 +129,7 @@ public class Player {
 							int braille = Integer.parseInt(subStringsB[1]);
 							String state = subStringsB[2].replace(">","");
 							simulator.getCell(braille).displayCharacter(state.charAt(0));
-						}
+						} 
 					} else {
 						readText(line);
 					}
@@ -121,7 +138,7 @@ public class Player {
 			} catch (IOException | ArrayIndexOutOfBoundsException e) {
 				System.err.println("Error occured while reading the file. Please make sure correct format is used");
 				e.printStackTrace();	
-				}
+			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Error location the file");
 		} finally {
@@ -132,7 +149,13 @@ public class Player {
 			}
 		}
 	}
-
+	public static String[] getComponents(String[] subString, int startValue) {
+		String[] components = new String[5];
+		for(;startValue<subString.length;startValue++) {
+			components[startValue-1] = subString[startValue];
+		}	
+		return components;
+	}
 	public static void doAction(HashMap<Integer, String[]> commandAction) {
 		switch(commandAction.get(buttonClicked)[0]){
 		case "PLAY": {
@@ -155,6 +178,11 @@ public class Player {
 			repeatSub(lastRead);
 			break;
 		}
+		case "BRAILLE": {
+			simulator.getCell(Integer.parseInt(commandAction.get(buttonClicked)[1]))
+			.displayCharacter(commandAction.get(buttonClicked)[2].charAt(0));
+			break;
+		}
 		default: {
 			System.out.println("Unknown command - "+commandAction.get(buttonClicked)[0]);
 			break;
@@ -165,22 +193,26 @@ public class Player {
 		return Integer.parseInt(str.replaceAll("[^0-9]", ""));
 	}
 	public static void readText(String textToRead) {
-		if (textToRead.length()>0) Speak.textToSpeech(textToRead);
+		//if (textToRead.length()>0) Speak.textToSpeech(textToRead);
+		if (textToRead.length()>0) System.out.println(textToRead);
 	}
 
 	public static void playSound(String filepath) {
-		Speak.playSound(filepath);
+		//Speak.playSound(filepath);
+		System.out.println(filepath);
 	}
 
 	public static void repeatLast(String textToRepeat) {
-		Speak.textToSpeech(textToRepeat);
+		//Speak.textToSpeech(textToRepeat);
+		System.out.println(textToRepeat);
 	}
 
 	public static void repeatSub(String textToRepeat) {
 		String textToRepeatTemp = textToRepeat;
 		while(textToRepeatTemp.indexOf("<")>0) {
 			String repeat = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<") + 1, textToRepeatTemp.indexOf(">"));
-			Speak.textToSpeech(repeat);
+			//Speak.textToSpeech(repeat);
+			System.out.println(repeat);
 			textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">") + 1, textToRepeatTemp.length());		
 		}
 	}

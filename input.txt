@@ -10,6 +10,9 @@ This is an exemplar interaction, Please clock button 1 will play a sound; clicki
 
 <<COMMAND>>	BUTTON 0=PLAY=./resources/beep.wav	BUTTON 1=CONTINUE	BUTTON 2=REPEAT	BUTTON 3=REPEATB=HI, repeat me	BUTTON 4=REPEATC
 
+Press button 1 to set braille 5 to A, press button 2 set braille 3 to B
+<<COMMAND>>	BUTTON 0=BRAILLE=4=A	BUTTON 1=BRAILLE=3=B
+
 <<QUIZ>>	CORRECT ANSWER=C	TRIALS=5	OPTION 0=A	OPTION 1=B	OPTION 2=C	OPTION 3=D
 
 <<BRAILLE=2=A>>
