@@ -153,14 +153,16 @@ public class PlayerNew {
 				try {										//Start try-catch block.
 					throw (new Exception("The simulator definition line does not have the right number of elements!"));	//Throw exception.
 				} catch(Exception e) {						//Catch the thrown exception.
-					e.printStackTrace();					//Print the stack trace of the exception.
+					e.printStackTrace();
+					System.exit(3);							//Stop program execution.
 				}
 			}
 		} else {											//If the first line did not contain the "<define>" command, then thrown an exception.
 			try {											//Start try-catch block.
 				throw (new Exception("The line that defines # of buttons and # of braille cells does not exist!"));	//Throw exception.
 			} catch(Exception e) {							//Catch the exception.
-				e.printStackTrace();						//Print the stack trace of the exception.
+				e.printStackTrace();
+				System.exit(4);								//Stop program execution.
 			}
 		}
 	}
@@ -171,11 +173,19 @@ public class PlayerNew {
 	 * @return The lines array list.
 	 */
 	public static ArrayList<String> getLines() {
-		if (lines == null || lines.isEmpty()) {	//Check if the lines array list is empty or null.
+		if (lines == null) {					//Check if the lines array list is null.
 			try {								//Begin try-catch block.
-				throw (new Exception());		//Throw an exception if the list is empty or null.
+				throw (new Exception("The array list 'lines' is null."));		//Throw an exception.
 			} catch(Exception e) {				//Catch the thrown exception.
 				e.printStackTrace();			//Print the stack trace of the exception.
+				System.exit(1);					//Exit the program with an error.
+			}
+		} else if (lines.isEmpty()) {			//Check if the lines array list is null. This means no lines were read from the file.
+			try {								//Begin try-catch block.
+				throw (new Exception("There are no lines contained within the input file."));		//Throw an exception.
+			} catch(Exception e) {				//Catch the thrown exception.
+				e.printStackTrace();			//Print the stack trace of the exception.
+				System.exit(2);					//Exit the program with an error.
 			}
 		}
 		return lines;							//If the lines array list isn't null or empty, return the lines array list.
