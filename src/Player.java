@@ -16,59 +16,57 @@ public class Player {
 	public static int buttonClicked;
 	public static boolean accessed = false;
 	static Simulator simulator = null; // Initializing Simulator instance
+	static HashMap<Integer, String[]> commandAction = new HashMap<Integer, String[]>(); //Holds button-action relationship
 
 	public static void main(String[] args) {
-		BufferedReader fileReader = null; // BufferedReader to read from file line by line
-		String line; // Variable "line" will be used for temporarily hold each line read from file
-		String[] subStrings, subStringsB; //subStrings is used for splitting string delimited by tab-space, subStringB by "="
-		PlayerB playerx = new PlayerB(); // Initializing action listener class instance
-		HashMap<Integer, String[]> commandAction = new HashMap<Integer, String[]>(); // This will used for holding action for command temporarily for a line
-
+		BufferedReader fileReader = null; //BufferedReader to read from file line by line
+		String line; //Variable "line" will be used for temporarily hold each line read from file
+		String[] subStrings, subStringsB;
+		PlayerB playerx = new PlayerB(); //Initializing action listener		
+		
 		try {
 			/*
 			 * Opens file for reading
 			 * Throws missing file exception
 			 */
 			fileReader = new BufferedReader(new FileReader(args[0])); 
+			
 			try {
 				/*
-				 * Reading input file line by line and performing respective action line-by-line
+				 * Reading input file line by line
 				 */
 				while((line = fileReader.readLine())!=null) {
-					if(Pattern.compile("<<.*>>").matcher(line).find()) { //Checking if line is contain command that requires addition work
+					if(Pattern.compile("<<.*>>").matcher(line).find()) {
 						subStrings = line.split("	"); // Splitting line by tab spaces
 
 						/*
-						 * Detecting keywords in line and performing corresponding computations:
-						 * 	<<COMMAND>> - Used in input for attaching action to buttons; each button-to-action command
-						 * 	is separated by tab. (i.e. <<COMMAND>>	BUTTON 0=PLAY=./sfc.wav; an action to PLAY sfx.wav is attached
-						 *  to BUTTON.
-						 *  <<QUIZ>> - Compares user answer (button click) with correct answer, and provide appropriate response.
-						 *  <<BRAILLE*>> is used for setting braille (no user interaction involved)
-						 *  	(i.e. <<BRAILLE=2=A>> sets braille cell 2 states to display character A)
-						 *  <<CELLS>> - Used for setting number buttons and cells in simulator
-						 *  <<SFX=*>> - Allows playing SFX without user interaction. (i.e. "Hello, can you hear the siren 
-						 *  	<<SFX=./siren.wav>>, can you?"; Program will read text and play sound accordingly)
-						 *  
+						 * Detecting keywords in line and performing corresponding computations (i.e. <<COMMAND>>,
+						 * 	 <<QUIZ>>, <<BRAILLE*>>, etc.)
 						 */
 						if(subStrings[0].contains("<<COMMAND>>")) {
+							/*
+							 * Stores button-to-action relationship in commandAction HashMap. Button ID is used as the 
+							 * 	key, and array of components needed for action as the value. Action are performed when
+							 * 	user clicks any relevant button.
+							 */
 							for (int i=1; i<subStrings.length;i++) {
-								subStringsB = subStrings[i].split("="); // Splitting components of line by "="
+								subStringsB = subStrings[i].split("=");
 								commandAction.put(getButton(subStringsB[0]), getComponents(subStringsB,1));					
 							}	
-							/*
-							 * Checking and waiting for actionPerformed method to execute before continuing to next line
-							 */
-							while(true) {
+							
+							while(true) {								
+								/*
+								 * Checking to see if button pressed is relevant for current command
+								 */
 								if (accessed && commandAction.get(buttonClicked)==null) {
 									readText("No action associated with button"+buttonClicked+". Please try again!");
 									accessed = false;
 									continue;
 								} else if (accessed && commandAction.get(buttonClicked)!=null) {
-									break;
+									break; // Exit loop to perform an action as relevant button is just clicked
 								} else {
 									/*
-									 * Putting main thread to sleep to wait for user input
+									 * Putting main thread to sleep for 100ms each time until user clicks a button.
 									 */
 									try {
 										Thread.sleep(100);
@@ -77,16 +75,20 @@ public class Player {
 									}
 								}
 							}
-							/*
-							 * Performing respective action based on button clicked
-							 */
-							doAction(commandAction);
-							commandAction.clear();
-							accessed = false;
+							doAction(commandAction); // Performs an action corresponding to button clicked
+							resetConfig();
 						} else if(subStrings[0].contains("<<CELLS>>")) {
+							/*
+							 * Initializes simulator using number of cells and buttons provided in input file
+							 */
 							simulator = new Simulator(Integer.parseInt(subStrings[1]), Integer.parseInt(subStrings[3]));
-							for (int i=0; i<Integer.parseInt(subStrings[3]);i++) simulator.getButton(i).addActionListener(playerx);
+							for (int i=0; i<Integer.parseInt(subStrings[3]);i++) {
+								simulator.getButton(i).addActionListener(playerx);
+							}
 						} else if(subStrings[0].contains("<<SFX=")) {
+							/*
+							 * Used for playing in-line SFX with or without having text on left, right or both sides.
+							 */
 							String textToRepeatTemp = line;
 							while(textToRepeatTemp.indexOf("<<")>=0) {
 								String play = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<<SFX=")
@@ -95,13 +97,17 @@ public class Player {
 									String read = textToRepeatTemp.substring(0, textToRepeatTemp.indexOf("<<SFX=") - 1);
 									readText(read);
 								} catch (StringIndexOutOfBoundsException e) {
-
+									// Non-harming StringIndexOutOfBoundsException is ignored
 								}
 								playSound(play);
-								textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">>") + 1, textToRepeatTemp.length());		
+								textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">>") + 1, 
+										textToRepeatTemp.length());		
 							}
 						} else if(subStrings[0].contains("<<QUIZ>>")) {
-							accessed = false;
+							/*
+							 * Compares user answer with correct answer and plays appropriate response message.
+							 */
+							resetConfig();
 							int trials = 0, tries = 0;
 							for (int i=1; i<subStrings.length;i++) {
 								subStringsB = subStrings[i].split("=");
@@ -221,6 +227,14 @@ public class Player {
 			break;
 		}
 		}
+	}
+	
+	/*
+	 * Resets previous used configuration for reuse
+	 */
+	public static void resetConfig() {
+		Player.accessed = false;
+		Player.commandAction.clear();
 	}
 	
 	/*
