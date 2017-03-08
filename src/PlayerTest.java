@@ -3,8 +3,6 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -74,12 +72,17 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testReadText() {
+		//Create a test string to run through the TTS engine.
 		String testString = "IF YOU HEAR THIS PLEASE PRESS Y. IF YOU HEAR THIS PLEASE PRESS Y.";
 		Player.readText(testString);
 		
+		//Ask user if they heard input.
 		System.out.println("Did you hear the computer talking? Y/N");
 		
+		//Take input from console.
 		Scanner scan = new Scanner(System.in);
+		
+		//If input is not Y for yes, its a fail.
 		if(!scan.nextLine().equalsIgnoreCase("y")) {
 			fail("If you could not hear the computer speak, its a fail!");
 		}
@@ -92,32 +95,52 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testPlaySound() {
+		//Play the test sound twice. This should play two beeps.
 		Player.playSound("./resources/beep.wav");
 		Player.playSound("./resources/beep.wav");
 		
+		//Ask user if they heard beeps.
 		System.out.println("Did you hear TWO beeps? Y/N");
 		
+		//Read in input from console.
 		Scanner scan = new Scanner(System.in);
+		
+		//Check if input is Y for yes.
 		if(!scan.nextLine().equalsIgnoreCase("y")) {
 			fail("No beeps heard, therefore fail.");
 		}
 	}
 	
 	/**
-	 * Test the doAction method
+	 * Tests the doAction method by creating a command and passing it to the
+	 * doAction method. A command is a hashMap in which an integer representing the
+	 * button number is mapped to a string representing the command.
+	 * In this test, the command is to play a sound and ask the user if they heard it.
 	 */
 	@Test
 	public void testDoAction() {
+		//Create a hash map similar to the one that would be created when parsing the input file.
 		HashMap<Integer, String[]> testCommand = new HashMap<>();
+		
+		//Simulate a test command from the input file to play a sound.
 		String[] testSplit = "BUTTON 0=PLAY=./resources/beep.wav".split("="); // Splitting components of line by "="
 		
+		//Check to  make sure that calling getButton on the string will return 0.
 		assertEquals(0, Player.getButton(testSplit[0]));
 		
-		
+		//Push the command number mapped to the command into the testCommand hash map.
 		testCommand.put(Player.getButton(testSplit[0]), Player.getComponents(testSplit,1));	
+		
+		//Call the doAction method with the testCommand hash map.
 		Player.doAction(testCommand);
+		
+		//Ask user if they heard the noise.
 		System.out.println("Did you hear ONE beep? Y/N");
+		
+		//Read in input from console.
 		Scanner scan = new Scanner(System.in);
+		
+		//Check if input is Y for yes.
 		if(!scan.nextLine().equalsIgnoreCase("y")) {
 			fail("No beeps heard, therefore fail.");
 		}
