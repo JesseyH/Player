@@ -110,7 +110,12 @@ public class PlayerTest {
 	public void testDoAction() {
 		HashMap<Integer, String[]> testCommand = new HashMap<>();
 		String[] testSplit = "BUTTON 0=PLAY=./resources/beep.wav".split("="); // Splitting components of line by "="
+		
+		assertEquals(0, Player.getButton(testSplit[0]));
+		
+		
 		testCommand.put(Player.getButton(testSplit[0]), Player.getComponents(testSplit,1));	
+		Player.doAction(testCommand);
 		System.out.println("Did you hear ONE beep? Y/N");
 		Scanner scan = new Scanner(System.in);
 		if(!scan.nextLine().equalsIgnoreCase("y")) {
