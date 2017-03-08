@@ -58,6 +58,10 @@ public class PlayerNew {
 	
 	public static void next() {
 		index += 1;
+		if(index >= getLines().size()) {
+			System.out.println("End of file.");
+			System.exit(0);
+		}
 		getCommand(getLines().get(index));
 	}
 	
