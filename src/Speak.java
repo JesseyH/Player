@@ -72,5 +72,3 @@ public class Speak {
 		Speak.textToSpeech("It's Alive");
 	}*/
 }
-
-
