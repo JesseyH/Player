@@ -94,8 +94,9 @@ public class PlayerNew {
 	}
 	
 	/**
-	 * assigns 
-	 * @param s
+	 * assigns the buttons with the correct jump locations and gives it an
+	 * actionListener
+	 * @param s string that contains the jump locations
 	 */
 	public static void option(String s) {
 		String jump[] = new String[buttons];
@@ -107,8 +108,9 @@ public class PlayerNew {
 	}
 	
 	/**
-	 * 
-	 * @param aString
+	 * displays a string to the cells on the simulator using the simulator
+	 * app
+	 * @param aString string to be displayed
 	 */
 	public static void display(String aString) {
 		simulator.displayString(aString);
@@ -207,7 +209,9 @@ public class PlayerNew {
 }
 
 /**
- * 
+ * Handles button clicks, if the button click is invalid it waits for another button click
+ * once a valid option is entered it removes the actionlistener and sends the correct 
+ * scenario line to be played by the getCommand function.
  * @author Group 6
  *
  */
