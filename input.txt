@@ -6,7 +6,7 @@ This is line 1
 
 Hello <only this part will be repeated>
 
-This is an exemplar interaction, Please clock button 1 will play a sound; clicking button 2 will <continue to next line>; clicking button 3 would repeat this line; clicking button 4 repeat specified text(*) after "REPEATB=*"; and button 5 will <repeat everything> in this paragraph between <*>. try it out
+This is an exemplar interaction, clicking button 1 will play a sound; clicking button 2 will <continue to next line>; clicking button 3 would repeat this line; clicking button 4 repeat specified text(*) after "REPEATB=*"; and button 5 will <repeat everything> in this paragraph between <*>. try it out
 
 <<COMMAND>>	BUTTON 0=PLAY=./resources/beep.wav	BUTTON 1=CONTINUE	BUTTON 2=REPEAT	BUTTON 3=REPEATB=HI, repeat me	BUTTON 4=REPEATC
 
