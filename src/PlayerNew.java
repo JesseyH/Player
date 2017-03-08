@@ -3,7 +3,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-/**This class reads a Story file and displays it to a Braille Simulator
+/**
+ * This class reads a Story file and displays it to a Braille Simulator
  * <p>
  * The main method reads the story file and stores it to an Arraylist of 
  * type string then it initializes the simulator with the size information
@@ -12,11 +13,11 @@ import java.util.Scanner;
  *
  */
 public class PlayerNew {
-	private static Simulator simulator;
+	protected static Simulator simulator;
 	protected static ArrayList<String> lines;
-	private static int buttons, cells;
+	protected static int buttons, cells;
 	protected static int index = 1;
-	private static OptionHandler l = new OptionHandler();
+	protected static OptionHandler l = new OptionHandler();
 	
 	/**
 	 * loads the story into an ArrayList, initializes the simulator and runs the story.
@@ -30,13 +31,16 @@ public class PlayerNew {
 		loadFileIntoArrayList(fileToLoad);		//Load the file into the lines array list.
 		initializeSimulator();					//Initialize the simulator.
 		
+		//parses the first index through the getCommand function. Starts the story.
 		getCommand(getLines().get(index));
 
 	}
 	
 	/**
+	 * Separates the input string into the command and the input it then sends
+	 * the input to a method to handle the information.
 	 * 
-	 * @param s
+	 * @param s the line being parsed for it's command and information
 	 * @return
 	 */
 	public static void getCommand(String s){
@@ -53,9 +57,13 @@ public class PlayerNew {
 			display(s);
 		} else {
 			new Exception("COMMAND WAS NOT FOUND!");
+			next();
 		}
 	}
 	
+	/**
+	 * moves the pointer of the index to the next line
+	 */
 	public static void next() {
 		index += 1;
 		if(index >= getLines().size()) {
@@ -66,8 +74,9 @@ public class PlayerNew {
 	}
 	
 	/**
-	 * 
-	 * @param fileName
+	 * plays a wav file
+	 * @param fileName the file name of the .wav file to be played
+	 * @pre the fileName is a valid file of type .wav
 	 */
 	public static void sfx(String fileName) {
 		Speak.playSound(fileName);
@@ -75,8 +84,9 @@ public class PlayerNew {
 	}
 	
 	/**
-	 * 
-	 * @param text
+	 * Sends the text to the textToSpeech method in Speak which converts 
+	 * the string into speech
+	 * @param text the text to be converted into speech
 	 */
 	public static void tts(String text) {
 		Speak.textToSpeech(text);
@@ -84,7 +94,7 @@ public class PlayerNew {
 	}
 	
 	/**
-	 * 
+	 * assigns 
 	 * @param s
 	 */
 	public static void option(String s) {
@@ -209,6 +219,9 @@ class OptionHandler implements ActionListener {
 		System.out.println(s);
 		if (s != "NULL") {
 			PlayerNew.index = Integer.valueOf(s);
+			for (int i = 0;i < PlayerNew.buttons; i++){
+				PlayerNew.simulator.getButton(i).removeActionListener(PlayerNew.l);
+			}
 			PlayerNew.getCommand(PlayerNew.getLines().get(PlayerNew.index));
 		} else {
 			PlayerNew.tts("Not a Valid Option. Please Try again.");
