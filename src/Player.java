@@ -243,14 +243,7 @@ public class Player {
 	public static void playSound(String filepath) {
 		Speak.playSound(filepath);
 	}
-
-	/*
-	 * Repeats the line that was just read by FreeTTS
-	 */
-	public static void repeatLast(String textToRepeat) {
-		Speak.textToSpeech(textToRepeat);
-	}
-
+	
 	/*
 	 * Repeats part of last line read enclosed within < > tags
 	 */
