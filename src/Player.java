@@ -213,6 +213,7 @@ public class Player {
 		case "BRAILLE": {
 			simulator.getCell(Integer.parseInt(commandAction.get(buttonClicked)[1]))
 			.displayCharacter(commandAction.get(buttonClicked)[2].charAt(0));
+			readText("Braille cell "+commandAction.get(buttonClicked)[1]+" is set to display "+commandAction.get(buttonClicked)[2]);
 			break;
 		}
 		default: {
@@ -233,24 +234,21 @@ public class Player {
 	 * Reads string argument provided using FreeTTS
 	 */
 	public static void readText(String textToRead) {
-		//if (textToRead.length()>0) Speak.textToSpeech(textToRead);
-		if (textToRead.length()>0) System.out.println(textToRead);
+		if (textToRead.length()>0) Speak.textToSpeech(textToRead);
 	}
 	
 	/*
 	 * Plays SFX located at the path provided to method
 	 */
 	public static void playSound(String filepath) {
-		//Speak.playSound(filepath);
-		System.out.println(filepath);
+		Speak.playSound(filepath);
 	}
 
 	/*
 	 * Repeats the line that was just read by FreeTTS
 	 */
 	public static void repeatLast(String textToRepeat) {
-		//Speak.textToSpeech(textToRepeat);
-		System.out.println(textToRepeat);
+		Speak.textToSpeech(textToRepeat);
 	}
 
 	/*
@@ -260,8 +258,7 @@ public class Player {
 		String textToRepeatTemp = textToRepeat;
 		while(textToRepeatTemp.indexOf("<")>0) {
 			String repeat = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<") + 1, textToRepeatTemp.indexOf(">"));
-			//Speak.textToSpeech(repeat);
-			System.out.println(repeat);
+			Speak.textToSpeech(repeat);
 			textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">") + 1, textToRepeatTemp.length());		
 		}
 	}
