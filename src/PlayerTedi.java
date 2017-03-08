@@ -40,6 +40,7 @@ public class PlayerTedi {
 				String currentLine = fileScanner.nextLine();	//Get the current line.
 				lines.add(currentLine);					//Append the current line to the array list.
 			}
+			fileScanner.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
