@@ -1,149 +1,114 @@
+
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.ArrayList;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests the player class.
+ * Automated test cases for the Player class.
+ * This class tets functions that do not required 
  * @author Group 6
  *
  */
 public class PlayerTest {
 
 	/**
-	 * This tests the getComponents method by simulating input
-	 * that would be read from a file and passing it to the get
-	 * components method. The string array returned is then analyzed
-	 * to ensure that it contains the correct strings.
+	 * Setup the Player instance before testing.
 	 */
-	@Test
-	public void testGetComponents() {
-		//Create the string that will be tested and split it based on '=" delimiter (similar to player file)
-		String[] testSplit = "BUTTON 0=BRAILLE=4=A".split("=");
-		
-		//Call the get components method 
-		String[] toTest = Player.getComponents(testSplit, 1);
-		
-		//Create a scoring system
-		int score = 0;
-		
-		//Loop over all indices in the toTest array.
-		for(String curr : toTest) {
-			if(curr != null) {
-				
-				//If any of the following words are found, increase the score counter.
-				switch (curr) {
-				case "BRAILLE":
-					score++;
-					break;
-				case "4":
-					score++;
-					break;
-				case "A":
-					score++;
-					break;
-				}
-			}
-		}
-		
-		//A score of 3 means the test is a pass
-		if(score != 3) {
-			fail("Get components method is NOT working properly!");
-		}
-	}
-	
-	/**
-	 * This tests the getButton method by simulating input that would
-	 * be read from an input file. This method ensures that when getButton
-	 * is passed a string such as "BUTTON 1", the number 1 is returned.
-	 */
-	@Test
-	public void testGetButton() {
-		String testString = "BUTTON 10";
-		assertEquals(10, Player.getButton(testString));
-	}
-	
-	/**
-	 * Tests the readText method by calling it and asking the user
-	 * if they heard the computer speak. If the user enters anything except y for yes,
-	 * the test is a fail.
-	 */
-	@Test
-	public void testReadText() {
-		//Create a test string to run through the TTS engine.
-		String testString = "IF YOU HEAR THIS PLEASE PRESS Y. IF YOU HEAR THIS PLEASE PRESS Y.";
-		Player.readText(testString);
-		
-		//Ask user if they heard input.
-		System.out.println("Did you hear the computer talking? Y/N");
-		
-		//Take input from console.
-		Scanner scan = new Scanner(System.in);
-		
-		//If input is not Y for yes, its a fail.
-		if(!scan.nextLine().equalsIgnoreCase("y")) {
-			fail("If you could not hear the computer speak, its a fail!");
-		}
-	}
-	
-	/**
-	 * Tests the playSound method by calling it and asking the user
-	 * if they heard beeping sounds. If the user enters anything except y for yes,
-	 * the test is a fail.
-	 */
-	@Test
-	public void testPlaySound() {
-		//Play the test sound twice. This should play two beeps.
-		Player.playSound("./resources/beep.wav");
-		Player.playSound("./resources/beep.wav");
-		
-		//Ask user if they heard beeps.
-		System.out.println("Did you hear TWO beeps? Y/N");
-		
-		//Read in input from console.
-		Scanner scan = new Scanner(System.in);
-		
-		//Check if input is Y for yes.
-		if(!scan.nextLine().equalsIgnoreCase("y")) {
-			fail("No beeps heard, therefore fail.");
-		}
-	}
-	
-	/**
-	 * Tests the doAction method by creating a command and passing it to the
-	 * doAction method. A command is a hashMap in which an integer representing the
-	 * button number is mapped to a string representing the command.
-	 * In this test, the command is to play a sound and ask the user if they heard it.
-	 */
-	@Test
-	public void testDoAction() {
-		//Create a hash map similar to the one that would be created when parsing the input file.
-		HashMap<Integer, String[]> testCommand = new HashMap<>();
-		
-		//Simulate a test command from the input file to play a sound.
-		String[] testSplit = "BUTTON 0=PLAY=./resources/beep.wav".split("="); // Splitting components of line by "="
-		
-		//Check to  make sure that calling getButton on the string will return 0.
-		assertEquals(0, Player.getButton(testSplit[0]));
-		
-		//Push the command number mapped to the command into the testCommand hash map.
-		testCommand.put(Player.getButton(testSplit[0]), Player.getComponents(testSplit,1));	
-		
-		//Call the doAction method with the testCommand hash map.
-		Player.doAction(testCommand);
-		
-		//Ask user if they heard the noise.
-		System.out.println("Did you hear ONE beep? Y/N");
-		
-		//Read in input from console.
-		Scanner scan = new Scanner(System.in);
-		
-		//Check if input is Y for yes.
-		if(!scan.nextLine().equalsIgnoreCase("y")) {
-			fail("No beeps heard, therefore fail.");
-		}
+	@BeforeClass
+	public static void setupBefore() {
+		Player.inTestMode = true;				//Put the player app into test mode. This disables some features that will break testing.
+		Player.start("input.txt");				//Start the player app.
 	}
 
+	/**
+	 * Tests the getCommand() method. It does this 
+	 * by simulating commands that would typically be read in
+	 * from the story file and testing the getCommand's return.
+	 */
+	@Test
+	public void testGetCommand() {
+		String sfxTest = "<SFX>,./resources/beep.wav";		//Simulate play sound affect command.
+		String ttsTest = "<TTS>,TEST";						//Simulate text to speech command.
+		String optionTest = "<OPTION>,2,5,NULL,NULL,NULL";	//Simulate the create option command.
+		String displayTest = "<DISPLAY>,test";				//Simulate the display text command.
+		String noCommandTest = "<NOCOMMAND>,hello";			//simulate calling a command that doesn't exist.
+		assertEquals(0, Player.getCommand(sfxTest));		//Test <SFX> command.
+		assertEquals(1, Player.getCommand(ttsTest));		//Test <TTS> command.
+		assertEquals(2, Player.getCommand(optionTest));		//Test <OPTION> command.
+		assertEquals(3, Player.getCommand(displayTest));	//Test <DISPLAY> command.
+		assertEquals(4, Player.getCommand(noCommandTest));	//Test a command that doesnt exist (<NOCOMMAND>).
+	}
+	
+	/*
+	 * Test the getLines() method.
+	 * It does this by ensuring that calling getLines() does
+	 * not return null as well as making sure it is not empty.
+	 */
+	@Test
+	public void testGetLines() {		
+		ArrayList<String> toTest = Player.getLines();	//Call the getLines method.
+		if(toTest == null) {							//Check if returned arrayList is null.
+			fail("Player.getLines() returns null.");	//Fail the test if its null.
+		} else if(toTest.isEmpty()) {					//Check if returned araryList is empty.
+														//Fail the test case if the returned arrayList is empty.
+			fail("Player.getLines() returns an empty list. Implies somthing went wrong with file loading/reading.");
+		}
+	}
+	
+	/**
+	 * Test the sfx() method.
+	 * It does this by ensuring the sfx() method returns true.
+	 */
+	@Test
+	public void testSFX() {
+		assertEquals(true, Player.sfx("./resources/beep.wav"));
+	}
+	
+	/**
+	 * Test the tts() method.
+	 * It does this by ensuring the tts() method returns true.
+	 */
+	@Test
+	public void testTTS() {
+		assertEquals(true, Player.tts("TEST"));
+	}
+	
+	/**
+	 * Test the option() method.
+	 * It does this by ensuring the option() method returns true.
+	 */
+	@Test
+	public void testOption() {
+		assertEquals(true, Player.option("2,5,NULL,NULL,NULL"));
+	}
+	
+	/**
+	 * Test the display() method.
+	 * It does this by ensuring the display() method returns true.
+	 */
+	@Test
+	public void testDisplay() {
+		assertEquals(true, Player.display("TEST"));
+	}
+	
+	/**
+	 * Test the tryParse() method.
+	 * It does this by ensuring the tryParse() method returns the
+	 * correct integer from a given string.
+	 */
+	@Test
+	public void testTryParse() {
+		String toParse = "10";
+		assertEquals(10, (int) Player.tryParse(toParse));
+		toParse = "11";
+		assertEquals(11, (int) Player.tryParse(toParse));
+		toParse = "12";
+		assertEquals(12, (int) Player.tryParse(toParse));
+		toParse = "9498573";
+		assertEquals(9498573, (int) Player.tryParse(toParse));
+	}
+	
 }

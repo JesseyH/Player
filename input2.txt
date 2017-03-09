@@ -1,8 +1,0 @@
-<define>,5,5
-<TTS>,HELLO
-<SFX>,./resources/beep.wav
-<OPTION>,2,5,NULL,NULL,NULL
-<TTS>,YOU MADE IT
-<SFX>,./resources/beep.wav
-<TTS>,You
-<DISPLAY>,Hey
