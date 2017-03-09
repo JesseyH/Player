@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @author Group 6
  *
  */
-public class PlayerNew {
+public class Player {
 	protected static Simulator simulator;
 	protected static ArrayList<String> lines;
 	protected static int buttons, cells;
@@ -238,11 +238,11 @@ class OptionHandler implements ActionListener {
 		String s = e.getActionCommand();
 		System.out.println(s);
 		if (!s.equalsIgnoreCase("NULL")) {
-			PlayerNew.index = Integer.valueOf(s);
-			for (int i = 0;i < PlayerNew.buttons; i++){
-				PlayerNew.simulator.getButton(i).removeActionListener(PlayerNew.l);
+			Player.index = Integer.valueOf(s);
+			for (int i = 0;i < Player.buttons; i++){
+				Player.simulator.getButton(i).removeActionListener(Player.l);
 			}
-			PlayerNew.getCommand(PlayerNew.getLines().get(PlayerNew.index));
+			Player.getCommand(Player.getLines().get(Player.index));
 		} else {
 			Speak.textToSpeech("Not a Valid Option. Please Try again.");
 		}

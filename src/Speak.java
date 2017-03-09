@@ -3,6 +3,12 @@ import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 import javax.sound.sampled.*;
 
+/**
+ * Speak class manages the text to speach engine as well
+ * as playing sounds.
+ * @author Group 6
+ *
+ */
 public class Speak {
 	private static final String VOICENAME_kevin = "kevin";
 	private static final int BUFFER_SIZE = 128000;
@@ -10,8 +16,8 @@ public class Speak {
 	private static Voice voice;
 	
 	/**
-	 * 
-	 * @param text
+	 * Uses the text to speech engine on the passed text.
+	 * @param text The text that will be spoken.
 	 */
 	public static void textToSpeech(String text) {
 		VoiceManager voiceManager = VoiceManager.getInstance();
@@ -22,8 +28,8 @@ public class Speak {
 	}
 	
 	/**
-	 * 
-	 * @param fileName
+	 * Plays a sound a file.
+	 * @param fileName The sound file to play.
 	 */
 	public static void playSound(String fileName){
         try {
@@ -52,23 +58,4 @@ public class Speak {
 		}
     }
 	
-	/*
-	 * 
-	 */
-	public static boolean isTextToSpeechActive() {
-		return voice.isLoaded();
-	}
-	
-	/*
-	 * 
-	 */
-	public static boolean isPlaySoundActive() {
-		return line.isOpen();
-	}
-	
-	//Example cases
-	/*public static void main(String[] args) {
-		Speak.playSound("resources/beep.wav");
-		Speak.textToSpeech("It's Alive");
-	}*/
 }
