@@ -153,7 +153,9 @@ public class Player {
 		if(!inTestMode) {	//Ensure the player app is not in testMode for JUnit testing.
 			index += 1;
 			if(index >= getLines().size()) {
-				System.out.println("End of file.");
+				String done = "End of file.";
+				System.out.println(done);
+				tts(done);
 				System.exit(0);
 			}
 			getCommand(getLines().get(index));
@@ -203,7 +205,6 @@ public class Player {
 	 * @param aString string to be displayed
 	 */
 	public static boolean display(String aString) {
-		System.out.println("STRING: " + aString);
 		simulator.displayString(aString);
 		next();
 		return true;

@@ -20,7 +20,7 @@ public class PlayerTest {
 	@BeforeClass
 	public static void setupBefore() {
 		Player.inTestMode = true;				//Put the player app into test mode. This disables some features that will break testing.
-		Player.start("input2.txt");				//Start the player app.
+		Player.start("input.txt");				//Start the player app.
 	}
 
 	/**
@@ -31,15 +31,15 @@ public class PlayerTest {
 	@Test
 	public void testGetCommand() {
 		String sfxTest = "<SFX>,./resources/beep.wav";		//Simulate play sound affect command.
-		String ttsTest = "<TTS>,HELLO";						//Simulate text to speech command.
+		String ttsTest = "<TTS>,TEST";						//Simulate text to speech command.
 		String optionTest = "<OPTION>,2,5,NULL,NULL,NULL";	//Simulate the create option command.
 		String displayTest = "<DISPLAY>,test";				//Simulate the display text command.
 		String noCommandTest = "<NOCOMMAND>,hello";			//simulate calling a command that doesn't exist.
-		assertEquals(Player.getCommand(sfxTest), 0);		//Test <SFX> command.
-		assertEquals(Player.getCommand(ttsTest), 1);		//Test <TTS> command.
-		assertEquals(Player.getCommand(optionTest), 2);		//Test <OPTION> command.
-		assertEquals(Player.getCommand(displayTest), 3);	//Test <DISPLAY> command.
-		assertEquals(Player.getCommand(noCommandTest), 4);	//Test a command that doesnt exist (<NOCOMMAND>).
+		assertEquals(0, Player.getCommand(sfxTest));		//Test <SFX> command.
+		assertEquals(1, Player.getCommand(ttsTest));		//Test <TTS> command.
+		assertEquals(2, Player.getCommand(optionTest));		//Test <OPTION> command.
+		assertEquals(3, Player.getCommand(displayTest));	//Test <DISPLAY> command.
+		assertEquals(4, Player.getCommand(noCommandTest));	//Test a command that doesnt exist (<NOCOMMAND>).
 	}
 	
 	/*
@@ -64,7 +64,7 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testSFX() {
-		assertEquals(Player.sfx("./resources/beep.wav"), true);
+		assertEquals(true, Player.sfx("./resources/beep.wav"));
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testTTS() {
-		assertEquals(Player.tts("TEST"), true);
+		assertEquals(true, Player.tts("TEST"));
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testOption() {
-		assertEquals(Player.option("2,5,NULL,NULL,NULL"), true);
+		assertEquals(true, Player.option("2,5,NULL,NULL,NULL"));
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class PlayerTest {
 	 */
 	@Test
 	public void testDisplay() {
-		assertEquals(Player.display("TEST"), true);
+		assertEquals(true, Player.display("TEST"));
 	}
 	
 	/**
@@ -102,13 +102,13 @@ public class PlayerTest {
 	@Test
 	public void testTryParse() {
 		String toParse = "10";
-		assertEquals((int) Player.tryParse(toParse), 10);
+		assertEquals(10, (int) Player.tryParse(toParse));
 		toParse = "11";
-		assertEquals((int) Player.tryParse(toParse), 11);
+		assertEquals(11, (int) Player.tryParse(toParse));
 		toParse = "12";
-		assertEquals((int) Player.tryParse(toParse), 12);
+		assertEquals(12, (int) Player.tryParse(toParse));
 		toParse = "9498573";
-		assertEquals((int) Player.tryParse(toParse), 9498573);
+		assertEquals(9498573, (int) Player.tryParse(toParse));
 	}
 	
 }
