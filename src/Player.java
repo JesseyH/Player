@@ -19,6 +19,8 @@ public class Player {
 	protected static int index = 1;
 	protected static OptionHandler l = new OptionHandler();
 	
+	public static boolean inTestMode = false; //Should be set to true when running test suite.
+	
 	/**
 	 * loads the story into an ArrayList, initializes the simulator and runs the story.
 	 * @param args
@@ -28,98 +30,17 @@ public class Player {
 		Scanner scan = new Scanner(System.in);	//Create scanner object.
 		String fileToLoad = scan.nextLine();	//Grab user input representing the file they would like to load.
 		scan.close();
-		loadFileIntoArrayList(fileToLoad);		//Load the file into the lines array list.
+		start(fileToLoad);						//Start the application.
+		getCommand(getLines().get(index));		//parses the first index through the getCommand function. Starts the story.
+	}
+	
+	/**
+	 * Starts the player application.
+	 * @param storyFile The file containing the story.
+	 */
+	public static void start(String storyFile) {
+		loadFileIntoArrayList(storyFile);		//Load the file into the lines array list.
 		initializeSimulator();					//Initialize the simulator.
-		
-		//parses the first index through the getCommand function. Starts the story.
-		getCommand(getLines().get(index));
-	}
-	
-	/**
-	 * Separates the input string into the command and the input it then sends
-	 * the input to a method to handle the information.
-	 * 
-	 * @param s the line being parsed for it's command and information
-	 * @return
-	 */
-	public static void getCommand(String s){
-		String split[] = new String[2];
-		split = s.split(",", 2);
-		System.out.println("CURRENT COMMAND: " + s);
-		if (split[0].equals("<SFX>")) {
-			sfx(split[1]);
-		} else if (split[0].equals("<TTS>")) {
-			tts(split[1]);
-		} else if (split[0].equals("<OPTION>")) {
-			option(split[1]);
-		} else if (split[0].equals("<DISPLAY>")) {
-			display(split[1]);
-		} else {
-			try {
-				throw (new Exception("COMMAND WAS NOT FOUND!"));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			next();
-		}
-	}
-	
-	/**
-	 * moves the pointer of the index to the next line
-	 */
-	public static void next() {
-		index += 1;
-		if(index >= getLines().size()) {
-			System.out.println("End of file.");
-			System.exit(0);
-		}
-		getCommand(getLines().get(index));
-	}
-	
-	/**
-	 * plays a wav file
-	 * @param fileName the file name of the .wav file to be played
-	 * @pre the fileName is a valid file of type .wav
-	 */
-	public static void sfx(String fileName) {
-		Speak.playSound(fileName);
-		next();
-	}
-	
-	/**
-	 * Sends the text to the textToSpeech method in Speak which converts 
-	 * the string into speech
-	 * @param text the text to be converted into speech
-	 */
-	public static void tts(String text) {
-		Speak.textToSpeech(text);
-		next();
-	}
-	
-	/**
-	 * assigns the buttons with the correct jump locations and gives it an
-	 * actionListener
-	 * @param s string that contains the jump locations
-	 */
-	public static void option(String s) {
-		String jump[] = new String[buttons];
-		jump = s.split(",", buttons);
-		for (int i = 0; i < buttons; i++) {
-			simulator.getButton(i).addActionListener(l);
-			simulator.getButton(i).setActionCommand(jump[i]);
-		}
-	}
-	
-	/**
-	 * displays a string to the cells on the simulator using the simulator
-	 * app
-	 * @param aString string to be displayed
-	 */
-	public static void display(String aString) {
-		System.out.println("STRING: " + aString);
-		simulator.displayString(aString);
-		next();
 	}
 	
 	/**
@@ -146,7 +67,7 @@ public class Player {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Initializes the simulator with the number of buttons and number of braille cells
 	 * defined in the input file. The first line of the input file should always contain
@@ -183,6 +104,104 @@ public class Player {
 				System.exit(4);								//Stop program execution.
 			}
 		}
+	}
+	
+	/**
+	 * Separates the input string into the command and the input it then sends
+	 * the input to a method to handle the information.
+	 * 
+	 * @param s the line being parsed for it's command and information
+	 * @return
+	 */
+	public static int getCommand(String s) {
+		String split[] = new String[2];
+		split = s.split(",", 2);
+		if (split[0].equals("<SFX>")) {
+			sfx(split[1]);
+			return 0;
+		} else if (split[0].equals("<TTS>")) {
+			tts(split[1]);
+			return 1;
+		} else if (split[0].equals("<OPTION>")) {
+			option(split[1]);
+			return 2;
+		} else if (split[0].equals("<DISPLAY>")) {
+			display(split[1]);
+			return 3;
+		} else {
+			try {
+					throw (new Exception("COMMAND WAS NOT FOUND!"));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				if(!inTestMode)
+					e.printStackTrace();
+			}
+			next();
+			return 4;
+		}
+	}
+	
+	/**
+	 * moves the pointer of the index to the next line
+	 */
+	public static void next() {
+		if(!inTestMode) {	//Ensure the player app is not in testMode for JUnit testing.
+			index += 1;
+			if(index >= getLines().size()) {
+				System.out.println("End of file.");
+				System.exit(0);
+			}
+			getCommand(getLines().get(index));
+		}
+	}
+	
+	/**
+	 * plays a wav file
+	 * @param fileName the file name of the .wav file to be played
+	 * @pre the fileName is a valid file of type .wav
+	 */
+	public static boolean sfx(String fileName) {
+		Speak.playSound(fileName);
+		next();
+		return true;
+	}
+	
+	/**
+	 * Sends the text to the textToSpeech method in Speak which converts 
+	 * the string into speech
+	 * @param text the text to be converted into speech
+	 */
+	public static boolean tts(String text) {
+		Speak.textToSpeech(text);
+		next();
+		return true;
+	}
+	
+	/**
+	 * assigns the buttons with the correct jump locations and gives it an
+	 * actionListener
+	 * @param s string that contains the jump locations
+	 */
+	public static boolean option(String s) {
+		String jump[] = new String[buttons];
+		jump = s.split(",", buttons);
+		for (int i = 0; i < buttons; i++) {
+			simulator.getButton(i).addActionListener(l);
+			simulator.getButton(i).setActionCommand(jump[i]);
+		}
+		return true;
+	}
+	
+	/**
+	 * displays a string to the cells on the simulator using the simulator
+	 * app
+	 * @param aString string to be displayed
+	 */
+	public static boolean display(String aString) {
+		System.out.println("STRING: " + aString);
+		simulator.displayString(aString);
+		next();
+		return true;
 	}
 	
 	/**
