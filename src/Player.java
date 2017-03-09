@@ -1,287 +1,251 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.regex.Pattern;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Scanner;
 /**
- * This class is included as an example of how to use the classes in the simulator package.
- * 
+ * This class reads a Story file and displays it to a Braille Simulator
+ * <p>
+ * The main method reads the story file and stores it to an Arraylist of 
+ * type string then it initializes the simulator with the size information
+ * obtained from the story file. It then runs the story.
+ * @author Group 6
+ *
  */
-public class Player {
-	static String lastRead;
-	public static int buttonClicked;
-	public static boolean accessed = false;
-	static Simulator simulator = null; // Initializing Simulator instance
-	static HashMap<Integer, String[]> commandAction = new HashMap<Integer, String[]>(); //Holds button-action relationship
-
-	public static void main(String[] args) {
-		BufferedReader fileReader = null; //BufferedReader to read from file line by line
-		String line; //Variable "line" will be used for temporarily hold each line read from file
-		String[] subStrings, subStringsB;
-		PlayerB playerx = new PlayerB(); //Initializing action listener		
+public class PlayerNew {
+	protected static Simulator simulator;
+	protected static ArrayList<String> lines;
+	protected static int buttons, cells;
+	protected static int index = 1;
+	protected static OptionHandler l = new OptionHandler();
+	
+	/**
+	 * loads the story into an ArrayList, initializes the simulator and runs the story.
+	 * @param args
+	 */
+	public static void main(String args[]) {
+		System.out.println("Please enter the file you would like to load (E.g input.txt):");
+		Scanner scan = new Scanner(System.in);	//Create scanner object.
+		String fileToLoad = scan.nextLine();	//Grab user input representing the file they would like to load.
 		
-		try {
-			/*
-			 * Opens file for reading
-			 * Throws missing file exception
-			 */
-			fileReader = new BufferedReader(new FileReader(args[0])); 
-			
-			try {
-				/*
-				 * Reading input file line by line
-				 */
-				while((line = fileReader.readLine())!=null) {
-					if(Pattern.compile("<<.*>>").matcher(line).find()) {
-						subStrings = line.split("	"); // Splitting line by tab spaces
+		loadFileIntoArrayList(fileToLoad);		//Load the file into the lines array list.
+		initializeSimulator();					//Initialize the simulator.
+		
+		//parses the first index through the getCommand function. Starts the story.
+		getCommand(getLines().get(index));
 
-						/*
-						 * Detecting keywords in line and performing corresponding computations (i.e. <<COMMAND>>,
-						 * 	 <<QUIZ>>, <<BRAILLE*>>, etc.)
-						 */
-						if(subStrings[0].contains("<<COMMAND>>")) {
-							/*
-							 * Stores button-to-action relationship in commandAction HashMap. Button ID is used as the 
-							 * 	key, and array of components needed for action as the value. Action are performed when
-							 * 	user clicks any relevant button.
-							 */
-							for (int i=1; i<subStrings.length;i++) {
-								subStringsB = subStrings[i].split("=");
-								commandAction.put(getButton(subStringsB[0]), getComponents(subStringsB,1));					
-							}	
-							
-							while(true) {								
-								/*
-								 * Checking to see if button pressed is relevant for current command
-								 */
-								if (accessed && commandAction.get(buttonClicked)==null) {
-									readText("No action associated with button"+buttonClicked+". Please try again!");
-									accessed = false;
-									continue;
-								} else if (accessed && commandAction.get(buttonClicked)!=null) {
-									break; // Exit loop to perform an action as relevant button is just clicked
-								} else {
-									/*
-									 * Putting main thread to sleep for 100ms each time until user clicks a button.
-									 */
-									try {
-										Thread.sleep(100);
-									} catch (InterruptedException e) {
-										System.out.println("Error occured while putting main thread to sleep");
-									}
-								}
-							}
-							doAction(commandAction); // Performs an action corresponding to button clicked
-							resetConfig();
-						} else if(subStrings[0].contains("<<CELLS>>")) {
-							/*
-							 * Initializes simulator using number of cells and buttons provided in input file
-							 */
-							simulator = new Simulator(Integer.parseInt(subStrings[1]), Integer.parseInt(subStrings[3]));
-							for (int i=0; i<Integer.parseInt(subStrings[3]);i++) {
-								simulator.getButton(i).addActionListener(playerx);
-							}
-						} else if(subStrings[0].contains("<<SFX=")) {
-							/*
-							 * Used for playing in-line SFX with or without having text on left, right or both sides.
-							 */
-							String textToRepeatTemp = line;
-							while(textToRepeatTemp.indexOf("<<")>=0) {
-								String play = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<<SFX=")
-										+ 6, textToRepeatTemp.indexOf(">>"));
-								try {
-									String read = textToRepeatTemp.substring(0, textToRepeatTemp.indexOf("<<SFX=") - 1);
-									readText(read);
-								} catch (StringIndexOutOfBoundsException e) {
-									// Non-harming StringIndexOutOfBoundsException is ignored
-								}
-								playSound(play);
-								textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">>") + 1, 
-										textToRepeatTemp.length());		
-							}
-						} else if(subStrings[0].contains("<<QUIZ>>")) {
-							/*
-							 * Compares user answer with correct answer and plays appropriate response message.
-							 */
-							resetConfig();
-							int trials = 0, tries = 0;
-							for (int i=1; i<subStrings.length;i++) {
-								subStringsB = subStrings[i].split("=");
-								if (i==1) {									
-									commandAction.put(-1, new String[] {subStringsB[1]});
-								} else if (i==2) {									
-									trials = Integer.parseInt(subStringsB[1]) - 1;
-								} else {												
-									commandAction.put(getButton(subStringsB[0]), new String[] {subStringsB[1]});
-								}
-							}
-							while(true) {
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e) {
-									System.err.println("Error occured while putting main thread to sleep");
-								}
-								try {
-									if (accessed && commandAction.get(buttonClicked)[0].equals(commandAction.get(-1)[0])) {
-										readText("Your answer is correct");
-										break;
-									} else if (accessed)  {
-										if (trials>0 && trials<=tries) {
-											readText("You were unable to guess the correct answer");
-											break;
-										}
-										readText("Please try again");
-										tries++;
-										accessed=false;
-									}
-								} catch (NullPointerException e) {
-									readText("There is no action associated with this button");
-									accessed=false;
-								}
-							}
-						} else if(subStrings[0].contains("<<BRAILLE")) {
-							subStringsB = subStrings[0].split("=");
-							int braille = Integer.parseInt(subStringsB[1]);
-							String state = subStringsB[2].replace(">","");
-							simulator.getCell(braille).displayCharacter(state.charAt(0));
-						} 
-					} else {
-						readText(line);
-					}
-					if (line.length()>0) lastRead=line;
-				}
-			} catch (IOException | ArrayIndexOutOfBoundsException e) {
-				System.err.println("Error occured while reading the file. Please make sure correct format is used");
-				e.printStackTrace();	
-			}
-		} catch (FileNotFoundException e) {
-			System.err.println("Error location the file");
-		} finally {
+	}
+	
+	/**
+	 * Separates the input string into the command and the input it then sends
+	 * the input to a method to handle the information.
+	 * 
+	 * @param s the line being parsed for it's command and information
+	 * @return
+	 */
+	public static void getCommand(String s){
+		String split[] = new String[2];
+		split = s.split(",", 2);
+		System.out.println("CURRENT COMMAND: " + s);
+		if (split[0].equals("<SFX>")) {
+			sfx(split[1]);
+		} else if (split[0].equals("<TTS>")) {
+			tts(split[1]);
+		} else if (split[0].equals("<OPTION>")) {
+			option(split[1]);
+		} else if (split[0].equals("<DISPLAY>")) {
+			display(split[1]);
+		} else {
 			try {
-				fileReader.close();
-			} catch (IOException e) {
-				System.err.println("Error closing file");
+				throw (new Exception("COMMAND WAS NOT FOUND!"));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			next();
+		}
+	}
+	
+	/**
+	 * moves the pointer of the index to the next line
+	 */
+	public static void next() {
+		index += 1;
+		if(index >= getLines().size()) {
+			System.out.println("End of file.");
+			System.exit(0);
+		}
+		getCommand(getLines().get(index));
+	}
+	
+	/**
+	 * plays a wav file
+	 * @param fileName the file name of the .wav file to be played
+	 * @pre the fileName is a valid file of type .wav
+	 */
+	public static void sfx(String fileName) {
+		Speak.playSound(fileName);
+		next();
+	}
+	
+	/**
+	 * Sends the text to the textToSpeech method in Speak which converts 
+	 * the string into speech
+	 * @param text the text to be converted into speech
+	 */
+	public static void tts(String text) {
+		Speak.textToSpeech(text);
+		next();
+	}
+	
+	/**
+	 * assigns the buttons with the correct jump locations and gives it an
+	 * actionListener
+	 * @param s string that contains the jump locations
+	 */
+	public static void option(String s) {
+		String jump[] = new String[buttons];
+		jump = s.split(",", buttons);
+		for (int i = 0; i < buttons; i++) {
+			simulator.getButton(i).addActionListener(l);
+			simulator.getButton(i).setActionCommand(jump[i]);
+		}
+	}
+	
+	/**
+	 * displays a string to the cells on the simulator using the simulator
+	 * app
+	 * @param aString string to be displayed
+	 */
+	public static void display(String aString) {
+		System.out.println("STRING: " + aString);
+		simulator.displayString(aString);
+		next();
+	}
+	
+	/**
+	 * Loads a file into the "lines" array list. The array list
+	 * will contain an entry for every line in the input file.
+	 * A line is defined as all the text preceding the new line character ( \n ).
+	 * @param toLoad The file to load into the array list.
+	 */
+	public static void loadFileIntoArrayList(String toLoad) {
+		if(lines == null) {				//Check if the lines array list is null.
+			lines = new ArrayList<>();	//If the array list is null, create a new instance.
+		} else if(!getLines().isEmpty()) {	//If lines array list isn't null, check if its empty.
+			getLines().clear();				//If the lines array list isn't empty, clear it so it is.
+		}
+		try {
+			File file = new File(toLoad);				//Load the file into a file object.
+			Scanner fileScanner = new Scanner(file);	//Create a scanner object that scans the file.
+			while(fileScanner.hasNextLine()) {			//Loop over every line in the file
+				String currentLine = fileScanner.nextLine();	//Get the current line.
+				lines.add(currentLine);					//Append the current line to the array list.
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Initializes the simulator with the number of buttons and number of braille cells
+	 * defined in the input file. The first line of the input file should always contain
+	 * the definitions for number of buttons and number of braille cells. The definition
+	 * line should look like this:
+	 * <DEFINE>,#_OF_CELLS,#_OF_BUTTONS
+	 */
+	public static void initializeSimulator() {
+		String definitionLine = getLines().get(0);			//Get the first line from the input file.
+		definitionLine.toLowerCase();						//Convert the line to lower case for further parsing.
+		
+		if(definitionLine.contains("<define>")) {			//Check if the first line contains the "<define>" command.
+			
+			String[] split = definitionLine.split(",");		//Split the line based on the "," delimiter.
+			
+			if(split.length == 3) {							//Check if the split string has 3 elements to it. First element is "<define>",
+															//second element should contain # of cells, third element should contain # of buttons.
+				cells = tryParse(split[1]);					//Attempt to convert the second element (# of cells) to an integer.
+				buttons = tryParse(split[2]);				//Attempt to convert the third element (# of btns) to to an integer.
+				simulator = new Simulator(cells, buttons);	//Initialize the simulator object with the # of cells and # of btns.
+			} else {										//If the split string does not have 3 elements to it, then an exception will be thrown.
+				try {										//Start try-catch block.
+					throw (new Exception("The simulator definition line does not have the right number of elements!"));	//Throw exception.
+				} catch(Exception e) {						//Catch the thrown exception.
+					e.printStackTrace();
+					System.exit(3);							//Stop program execution.
+				}
+			}
+		} else {											//If the first line did not contain the "<define>" command, then thrown an exception.
+			try {											//Start try-catch block.
+				throw (new Exception("The line that defines # of buttons and # of braille cells does not exist!"));	//Throw exception.
+			} catch(Exception e) {							//Catch the exception.
+				e.printStackTrace();
+				System.exit(4);								//Stop program execution.
 			}
 		}
 	}
-	/*
-	 * Returns an array containing the components required to perform corresponding action
-	 * 	i.e. For the instruction--BUTTON 1=BRAILLE=3=B-- 3 and B will be stored as
-	 * 	components in an array with same order.
+	
+	/**
+	 * Gets the lines array list or throws an exception
+	 * if the lines array list is null or empty.
+	 * @return The lines array list.
 	 */
-	public static String[] getComponents(String[] subString, int startValue) {
-		String[] components = new String[5];
-		for(;startValue<subString.length;startValue++) {
-			components[startValue-1] = subString[startValue];
-		}	
-		return components;
+	public static ArrayList<String> getLines() {
+		if (lines == null) {					//Check if the lines array list is null.
+			try {								//Begin try-catch block.
+				throw (new Exception("The array list 'lines' is null."));		//Throw an exception.
+			} catch(Exception e) {				//Catch the thrown exception.
+				e.printStackTrace();			//Print the stack trace of the exception.
+				System.exit(1);					//Exit the program with an error.
+			}
+		} else if (lines.isEmpty()) {			//Check if the lines array list is null. This means no lines were read from the file.
+			try {								//Begin try-catch block.
+				throw (new Exception("There are no lines contained within the input file."));		//Throw an exception.
+			} catch(Exception e) {				//Catch the thrown exception.
+				e.printStackTrace();			//Print the stack trace of the exception.
+				System.exit(2);					//Exit the program with an error.
+			}
+		}
+		return lines;							//If the lines array list isn't null or empty, return the lines array list.
 	}
 	
-	/*
-	 * 
-	 * Performs action based on instruction codes:
-	 * PLAY - players SFX file using path provided (i.e. BUTTON 0=PLAY=./resources/beep.wav)
-	 * CONTINUE - Wait for user to press button corresponding to CONTINUE instruction and continues to read next line
-	 * REPEAT - repeats the line that was just read
-	 * REPATB - repeats text provided after "REPEATB=". (i.e. REPEATB=HELLO WORLD; for this "HELLO WORLD will be repeated)
-	 * REPATC - repeats components of the last read line that are enclosed by <>;
-	 * 	i.e. REPEATC command on line - "Hello <WORLD> IS <COOL>" will repeat "WORLD" and "COOL"
-	 * BRAILLE - Used for setting the braille cells state. (i.e. BUTTON 1=BRAILLE=3=B; When button 1 is clicked
-	 * braille cell 3 will be set to display character B)
-	 * 
+	/**
+	 * Attempts to convert a string object to an integer object.
+	 * @param text The string that contains the integer to be parsed.
+	 * @return The integer that was parsed.
 	 */
-	public static void doAction(HashMap<Integer, String[]> commandAction) {
-		switch(commandAction.get(buttonClicked)[0]){
-		case "PLAY": {
-			playSound(commandAction.get(buttonClicked)[1]);
-			break;
-		}
-		case "CONTINUE": {
-			break;
-		}
-		case "REPEAT": {
-			System.out.println(commandAction.get(buttonClicked)[0] +" - "+lastRead);
-			readText(lastRead);
-			break;
-		}
-		case "REPEATB": {
-			readText(commandAction.get(buttonClicked)[1]);
-			break;
-		}
-		case "REPEATC": {
-			repeatSub(lastRead);
-			break;
-		}
-		case "BRAILLE": {
-			simulator.getCell(Integer.parseInt(commandAction.get(buttonClicked)[1]))
-			.displayCharacter(commandAction.get(buttonClicked)[2].charAt(0));
-			readText("Braille cell "+commandAction.get(buttonClicked)[1]+" is set to display "+commandAction.get(buttonClicked)[2]);
-			break;
-		}
-		default: {
-			System.out.println("Unknown command - "+commandAction.get(buttonClicked)[0]);
-			break;
-		}
-		}
-	}
-	
-	/*
-	 * Resets previous used configuration for reuse
-	 */
-	public static void resetConfig() {
-		Player.accessed = false;
-		Player.commandAction.clear();
-	}
-	
-	/*
-	 * Extracts button number as an integer from instruction (i.e. input to method - BUTTON 1; output - 1)
-	 */
-	public static int getButton(String str) {
-		return Integer.parseInt(str.replaceAll("[^0-9]", ""));
-	}
-	
-	/*
-	 * Reads string argument provided using FreeTTS
-	 */
-	public static void readText(String textToRead) {
-		if (textToRead.length()>0) Speak.textToSpeech(textToRead);
-	}
-	
-	/*
-	 * Plays SFX located at the path provided to method
-	 */
-	public static void playSound(String filepath) {
-		Speak.playSound(filepath);
-	}
-	
-	/*
-	 * Repeats part of last line read enclosed within < > tags
-	 */
-	public static void repeatSub(String textToRepeat) {
-		String textToRepeatTemp = textToRepeat;
-		while(textToRepeatTemp.indexOf("<")>0) {
-			String repeat = textToRepeatTemp.substring(textToRepeatTemp.indexOf("<") + 1, textToRepeatTemp.indexOf(">"));
-			Speak.textToSpeech(repeat);
-			textToRepeatTemp = textToRepeatTemp.substring(textToRepeatTemp.indexOf(">") + 1, textToRepeatTemp.length());		
+	public static Integer tryParse(String text) {
+		try {								//Begin try-catch block.
+			return Integer.parseInt(text);	//Attempt to convert the string to an integer and return the value.
+		} catch (NumberFormatException e) {	//Catch any conversion exceptions.
+			e.printStackTrace();			//Print the stack trace of the exception.
+			return null;					//Return null if there was an exception with the conversion.
 		}
 	}
 }
 
-/*
- * ActionListener for all the buttons
- * Sets variable buttonClicked and accessed which is used for continuing paused main method
- * 	and to perform action that user requested by clicking specific button.
+/**
+ * Handles button clicks, if the button click is invalid it waits for another button click
+ * once a valid option is entered it removes the actionlistener and sends the correct 
+ * scenario line to be played by the getCommand function.
+ * @author Group 6
+ *
  */
-class PlayerB implements ActionListener {
+class OptionHandler implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Player.buttonClicked = Integer.parseInt(e.getActionCommand());
-		Player.accessed = true;
+		String s = e.getActionCommand();
+		System.out.println(s);
+		if (!s.equalsIgnoreCase("NULL")) {
+			PlayerNew.index = Integer.valueOf(s);
+			for (int i = 0;i < PlayerNew.buttons; i++){
+				PlayerNew.simulator.getButton(i).removeActionListener(PlayerNew.l);
+			}
+			PlayerNew.getCommand(PlayerNew.getLines().get(PlayerNew.index));
+		} else {
+			Speak.textToSpeech("Not a Valid Option. Please Try again.");
+		}
 	}
 
 }
