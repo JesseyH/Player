@@ -27,13 +27,12 @@ public class Player {
 		System.out.println("Please enter the file you would like to load (E.g input.txt):");
 		Scanner scan = new Scanner(System.in);	//Create scanner object.
 		String fileToLoad = scan.nextLine();	//Grab user input representing the file they would like to load.
-		
+		scan.close();
 		loadFileIntoArrayList(fileToLoad);		//Load the file into the lines array list.
 		initializeSimulator();					//Initialize the simulator.
 		
 		//parses the first index through the getCommand function. Starts the story.
 		getCommand(getLines().get(index));
-
 	}
 	
 	/**
@@ -142,6 +141,7 @@ public class Player {
 				String currentLine = fileScanner.nextLine();	//Get the current line.
 				lines.add(currentLine);					//Append the current line to the array list.
 			}
+			fileScanner.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -227,7 +227,7 @@ public class Player {
 /**
  * Handles button clicks, if the button click is invalid it waits for another button click
  * once a valid option is entered it removes the actionlistener and sends the correct 
- * scenario line to be played by the getCommand function.
+ * scenarioF line to be played by the getCommand function.
  * @author Group 6
  *
  */
