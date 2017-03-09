@@ -43,6 +43,11 @@ public class Player {
 		initializeSimulator();					//Initialize the simulator.
 	}
 	
+	public static void jump(String j) {
+		index = Integer.valueOf(j);
+		getCommand(getLines().get(index));		
+	}
+	
 	/**
 	 * Loads a file into the "lines" array list. The array list
 	 * will contain an entry for every line in the input file.
