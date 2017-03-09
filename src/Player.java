@@ -54,6 +54,8 @@ public class Player {
 			option(split[1]);
 		} else if (split[0].equals("<DISPLAY>")) {
 			display(split[1]);
+		} else if (split[0].equals("<JUMP>")) {
+			jump(split[1]);
 		} else {
 			try {
 				throw (new Exception("COMMAND WAS NOT FOUND!"));
@@ -120,6 +122,11 @@ public class Player {
 		System.out.println("STRING: " + aString);
 		simulator.displayString(aString);
 		next();
+	}
+	
+	public static void jump(String j) {
+		index = Integer.valueOf(j);
+		getCommand(getLines().get(index));		
 	}
 	
 	/**
