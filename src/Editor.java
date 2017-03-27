@@ -1,13 +1,8 @@
 import java.awt.EventQueue;
-
 import javax.swing.*;
-
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,28 +11,20 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.awt.Window.Type;
 
 public class Editor {
 
 	private JFrame frame;
 	boolean configured = false;
+	static String currentFile = null;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		try {
-			PrintWriter writer = new PrintWriter("commands.txt");
-			writer.close();
-		} catch (FileNotFoundException e) {
-
-		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -57,6 +44,60 @@ public class Editor {
 		initialize();
 	}
 
+	public String createScenerio(String fileName) {
+		try {
+			PrintWriter writer = new PrintWriter(fileName+".txt");
+			currentFile = fileName+".txt";
+			writer.close();
+		} catch (FileNotFoundException e) {
+
+		}
+		return null;
+	}
+
+	private void config() {
+		BufferedReader readExistingLines;
+		JTextField nButtons = new JTextField(2);
+		JTextField nCells = new JTextField(15);
+		JPanel skioLineView = new JPanel();
+		skioLineView.add(new JLabel("Number of buttons:"));
+		skioLineView.add(nButtons);
+		skioLineView.add(new JLabel("Number of braille cells:"));
+		skioLineView.add(nCells);
+		int result = JOptionPane.showConfirmDialog(null, skioLineView, 
+				"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+		if (nCells.getText().length()!=0 || nButtons.getText().length()!=0) {
+			try {
+				int braille = Integer.parseInt(nCells.getText()),
+						button = Integer.parseInt(nButtons.getText());
+				if (braille>0 && button>0) {
+					try {
+						readExistingLines = new BufferedReader(new FileReader(currentFile));
+						String line, finalOut = "";
+						while((line = readExistingLines.readLine())!=null) {
+							if (!line.matches("Cell \\d+") && !line.matches("Button \\d+")) finalOut+=line+"\n";
+						}
+						FileWriter fileWriter = new FileWriter(currentFile);
+						BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+						bufferedWriter.write("Cell "+braille+"\n");
+						bufferedWriter.write("Button "+button+"\n");
+						bufferedWriter.write(finalOut);
+						bufferedWriter.flush();
+						bufferedWriter.close();
+						configured = true;
+
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				} else JOptionPane.showMessageDialog(null,"Both inputs must be greater than 0");
+			} catch (NumberFormatException x) {
+				JOptionPane.showMessageDialog(null,"Both inputs must be integer");
+			}
+		} else {
+			if (result == JOptionPane.OK_OPTION) 
+				JOptionPane.showMessageDialog(null,"Please enter number of braille cells and buttons");
+		}
+	}
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -68,7 +109,7 @@ public class Editor {
 		frame.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				ifTerminate();
+				if(ifTerminate()>=0) frame.dispose();
 			}
 		});
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
@@ -77,48 +118,52 @@ public class Editor {
 		btnNewButton.setBackground(new Color(0, 0, 51));
 		btnNewButton.setForeground(Color.WHITE);
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JTextField nButtons = new JTextField(2);
-				JTextField nCells = new JTextField(15);
-				JPanel skioLineView = new JPanel();
-				skioLineView.add(new JLabel("Number of buttons:"));
-				skioLineView.add(nButtons);
-				skioLineView.add(new JLabel("Number of braille cells:"));
-				skioLineView.add(nCells);
-				JOptionPane.showConfirmDialog(null, skioLineView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				if (nCells.getText().length()!=0 || nButtons.getText().length()!=0) {
-					try {
-						int braille = Integer.parseInt(nCells.getText()),
-								button = Integer.parseInt(nButtons.getText());
-						if (braille>0 && button>0) {
-							try {
-								BufferedReader readExistingLines = new BufferedReader(new FileReader("commands.txt"));
-								String line, finalOut = "";
-								while((line = readExistingLines.readLine())!=null) {
-									if (!line.matches("Cell \\d+") && !line.matches("Button \\d+")) finalOut+=line+"\n";
-								}
-								FileWriter fileWriter = new FileWriter("commands.txt");
-								BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-								bufferedWriter.write("Cell "+braille+"\n");
-								bufferedWriter.write("Button "+button+"\n");
-								bufferedWriter.write(finalOut);
-								bufferedWriter.flush();
-								bufferedWriter.close();
-								configured = true;
 
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}
-						} else JOptionPane.showMessageDialog(null,"Both inputs must be greater than 0");
-					} catch (NumberFormatException x) {
-						JOptionPane.showMessageDialog(null,"Both inputs must be integer");
-					}
+			public void actionPerformed(ActionEvent arg0) {
+				if(isScenerio()) {
+					config();
 				} else {
-					JOptionPane.showMessageDialog(null,"Please enter number of braille cells and buttons");
+					JOptionPane.showMessageDialog(null, "No scenerio file");
 				}
 			}
 		});
+
+		JButton btnCreateNewScenerio = new JButton("Create new scenerio file");
+		btnCreateNewScenerio.setBackground(new Color(0, 0, 51));
+		btnCreateNewScenerio.setForeground(Color.WHITE);
+		btnCreateNewScenerio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(currentFile==null) {
+					String fileName = JOptionPane.showInputDialog(frame, "Name of scenerio file:");
+					if(fileName!=null && fileName.length()>0) {
+						createScenerio(fileName);
+						JOptionPane.showMessageDialog(null,"Scenerio file \""+currentFile+"\" is created");
+					}
+				} else {
+					JOptionPane.showMessageDialog(null,"Scenerio file alredy exists - "+currentFile);
+				}
+			}
+		});
+		frame.getContentPane().add(btnCreateNewScenerio);
+
+		JButton btnEditExistingScenerio = new JButton("Edit existing scenerio file");
+		btnEditExistingScenerio.setBackground(new Color(0, 0, 51));
+		btnEditExistingScenerio.setForeground(Color.WHITE);
+		btnEditExistingScenerio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!isScenerio()) {
+					if(browseFile()!=null) {
+						currentFile = browseFile();
+						JOptionPane.showMessageDialog(null, "Scenerio file '"+currentFile+"' is selected");
+					} else {
+						JOptionPane.showMessageDialog(null, "No file selected");
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Scenerio file already exists");
+				}
+			}
+		});
+		frame.getContentPane().add(btnEditExistingScenerio);
 		frame.getContentPane().add(btnNewButton);
 
 
@@ -127,13 +172,17 @@ public class Editor {
 		btnNewButton_6.setForeground(Color.WHITE);
 		btnNewButton_6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextArea textArea = new JTextArea();
-				JScrollPane scrollable = new JScrollPane(textArea);  
-				textArea.setLineWrap(true);  
-				textArea.setWrapStyleWord(true); 
-				scrollable.setPreferredSize(new Dimension(400,200));
-				JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
-				if(textArea.getText().length()>0) appendToFile(textArea.getText()+"\n");
+				if(isScenerio()) {
+					JTextArea textArea = new JTextArea();
+					JScrollPane scrollable = new JScrollPane(textArea);  
+					textArea.setLineWrap(true);  
+					textArea.setWrapStyleWord(true); 
+					scrollable.setPreferredSize(new Dimension(400,200));
+					JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
+					if(textArea.getText().length()>0) appendToFile(textArea.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_6);
@@ -143,10 +192,13 @@ public class Editor {
 		btnNewButton_4.setForeground(Color.WHITE);
 		btnNewButton_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser browseFile = new JFileChooser();
-				browseFile.showOpenDialog(frame);
-				File selectedFile = browseFile.getSelectedFile();
-				appendToFile("\n/~sound:"+selectedFile+"\n");
+				if(isScenerio()) {
+					JFileChooser browseFile = new JFileChooser();
+					browseFile.showOpenDialog(frame);
+					appendToFile("\n/~sound:"+browseFile()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_4);
@@ -156,8 +208,12 @@ public class Editor {
 		btnNewButton_2.setForeground(Color.WHITE);
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String pauseDuration = JOptionPane.showInputDialog(frame, "Duration of the pause:");
-				appendToFile("/~pause:"+pauseDuration+"\n");
+				if(isScenerio()) {
+					String pauseDuration = JOptionPane.showInputDialog(frame, "Duration of the pause:");
+					appendToFile("/~pause:"+pauseDuration+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_2);
@@ -167,8 +223,10 @@ public class Editor {
 		btnNewButton_3.setForeground(Color.WHITE);
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String voice = JOptionPane.showInputDialog(frame, "Select a voice for TTS (1,2,3 or 4):");
-				appendToFile("/~set-voice:"+voice+"\n");
+				if(isScenerio()) {
+					String voice = JOptionPane.showInputDialog(frame, "Select a voice for TTS (1,2,3 or 4):");
+					appendToFile("/~set-voice:"+voice+"\n");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_3);
@@ -178,8 +236,12 @@ public class Editor {
 		btnNewButton_5.setForeground(Color.WHITE);
 		btnNewButton_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String strToDisp = JOptionPane.showInputDialog(frame, "Input string to display using braille cells:");
-				appendToFile("/~disp-string:"+strToDisp+"\n");
+				if(isScenerio()) {
+					String strToDisp = JOptionPane.showInputDialog(frame, "Input string to display using braille cells:");
+					appendToFile("/~disp-string:"+strToDisp+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_5);
@@ -189,13 +251,17 @@ public class Editor {
 		btnNewButton_7.setForeground(Color.WHITE);
 		btnNewButton_7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextArea textArea = new JTextArea();
-				JScrollPane scrollable = new JScrollPane(textArea);  
-				textArea.setLineWrap(true);  
-				textArea.setWrapStyleWord(true); 
-				scrollable.setPreferredSize(new Dimension(400,200));
-				JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
-				appendToFile("/~repeat\n"+textArea.getText()+"\n/~endrepeat\n");
+				if(isScenerio()) {
+					JTextArea textArea = new JTextArea();
+					JScrollPane scrollable = new JScrollPane(textArea);  
+					textArea.setLineWrap(true);  
+					textArea.setWrapStyleWord(true); 
+					scrollable.setPreferredSize(new Dimension(400,200));
+					JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
+					appendToFile("/~repeat\n"+textArea.getText()+"\n/~endrepeat\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_7);
@@ -205,9 +271,13 @@ public class Editor {
 		btnNewButton_1.setForeground(Color.WHITE);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String repeatBtn = JOptionPane.showInputDialog(frame, "Please input index of the button that"
-						+ "will handle repeat functionality");
-				appendToFile("/~repeat-button:"+repeatBtn+"\n");
+				if(isScenerio()) {
+					String repeatBtn = JOptionPane.showInputDialog(frame, "Please input index of the button that"
+							+ "will handle repeat functionality");
+					appendToFile("/~repeat-button:"+repeatBtn+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_1);
@@ -215,8 +285,12 @@ public class Editor {
 		JButton btnNewButton_8 = new JButton("Add target line for skip functionality");
 		btnNewButton_8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String skipTarget = JOptionPane.showInputDialog(frame, "Line identifier:");
-				appendToFile("/~"+skipTarget+"\n");
+				if(isScenerio()) {
+					String skipTarget = JOptionPane.showInputDialog(frame, "Line identifier:");
+					appendToFile("/~"+skipTarget+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		btnNewButton_8.setBackground(new Color(0, 0, 51));
@@ -226,8 +300,12 @@ public class Editor {
 		JButton btnNewButton_9 = new JButton("Skip to target line in file");
 		btnNewButton_9.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String targetLine = JOptionPane.showInputDialog(frame, "Target line identifier:");
-				appendToFile("/~skip:"+targetLine+"\n");
+				if(isScenerio()) {
+					String targetLine = JOptionPane.showInputDialog(frame, "Target line identifier:");
+					appendToFile("/~skip:"+targetLine+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		btnNewButton_9.setBackground(new Color(0, 0, 51));
@@ -237,16 +315,20 @@ public class Editor {
 		JButton btnNewButton_10 = new JButton("Assign button to skip to line");
 		btnNewButton_10.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextField buttonID = new JTextField(2);
-				JTextField skipID = new JTextField(2);
-				JPanel skioLineView = new JPanel();
-				skioLineView.add(new JLabel("Button ID:"));
-				skioLineView.add(buttonID);
-				skioLineView.add(new JLabel("Skip to line with identifier:"));
-				skioLineView.add(skipID);
-				JOptionPane.showConfirmDialog(null, skioLineView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				appendToFile("/~skip-button:"+buttonID.getText()+" "+skipID.getText()+"\n");
+				if(isScenerio()) {
+					JTextField buttonID = new JTextField(2);
+					JTextField skipID = new JTextField(2);
+					JPanel skioLineView = new JPanel();
+					skioLineView.add(new JLabel("Button ID:"));
+					skioLineView.add(buttonID);
+					skioLineView.add(new JLabel("Skip to line with identifier:"));
+					skioLineView.add(skipID);
+					JOptionPane.showConfirmDialog(null, skioLineView, 
+							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+					appendToFile("/~skip-button:"+buttonID.getText()+" "+skipID.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		btnNewButton_10.setBackground(new Color(0, 0, 51));
@@ -256,7 +338,11 @@ public class Editor {
 		JButton btnNewButton_11 = new JButton("Request user input(button press)");
 		btnNewButton_11.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				appendToFile("/~user-input\n");
+				if(isScenerio()) {
+					appendToFile("/~user-input\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		btnNewButton_11.setBackground(new Color(0, 0, 51));
@@ -266,7 +352,11 @@ public class Editor {
 		JButton btnNewButton_12 = new JButton("Reset all the buttons");
 		btnNewButton_12.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				appendToFile("/~reset-buttons\n");
+				if(isScenerio()) {
+					appendToFile("/~reset-buttons\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		btnNewButton_12.setBackground(new Color(0, 0, 51));
@@ -276,7 +366,12 @@ public class Editor {
 		JButton btnNewButton_13 = new JButton("Save and Exit");
 		btnNewButton_13.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ifTerminate();
+				if(isScenerio()) {
+					if(ifTerminate()==0) frame.dispose();
+					else if(ifTerminate()==2) JOptionPane.showMessageDialog(null, "No scenerio file is created");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 
@@ -285,7 +380,11 @@ public class Editor {
 		btnNewButton_14.setForeground(Color.WHITE);
 		btnNewButton_14.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				appendToFile("/~disp-clearAll\n");
+				if(isScenerio()) {
+					appendToFile("/~disp-clearAll\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_14);
@@ -295,8 +394,12 @@ public class Editor {
 		btnNewButton_15.setForeground(Color.WHITE);
 		btnNewButton_15.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String clearID = JOptionPane.showInputDialog(frame, "Clear braille cell with ID:");
-				appendToFile("/~disp-clear-cell:"+clearID+"\n");
+				if(isScenerio()) {
+					String clearID = JOptionPane.showInputDialog(frame, "Clear braille cell with ID:");
+					appendToFile("/~disp-clear-cell:"+clearID+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_15);
@@ -306,16 +409,20 @@ public class Editor {
 		btnNewButton_16.setForeground(Color.WHITE);
 		btnNewButton_16.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextField cellID = new JTextField(2);
-				JTextField state = new JTextField(15);
-				JPanel setStateView = new JPanel();
-				setStateView.add(new JLabel("Braille cell ID:"));
-				setStateView.add(cellID);
-				setStateView.add(new JLabel("Set to state(8-character sequence; i.e. 10101010, 1 - raised, 0 - low) :"));
-				setStateView.add(state);
-				JOptionPane.showConfirmDialog(null, setStateView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				appendToFile("/~disp-cell-pins:"+cellID.getText()+" "+state.getText()+"\n");
+				if(isScenerio()) {
+					JTextField cellID = new JTextField(2);
+					JTextField state = new JTextField(15);
+					JPanel setStateView = new JPanel();
+					setStateView.add(new JLabel("Braille cell ID:"));
+					setStateView.add(cellID);
+					setStateView.add(new JLabel("Set to state(8-character sequence; i.e. 10101010, 1 - raised, 0 - low) :"));
+					setStateView.add(state);
+					JOptionPane.showConfirmDialog(null, setStateView, 
+							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+					appendToFile("/~disp-cell-pins:"+cellID.getText()+" "+state.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnNewButton_16);
@@ -325,16 +432,20 @@ public class Editor {
 		btnSetBrailleCell.setForeground(Color.WHITE);
 		btnSetBrailleCell.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextField cellID = new JTextField(2);
-				JTextField charToSet = new JTextField(2);
-				JPanel setStateView = new JPanel();
-				setStateView.add(new JLabel("Braille cell ID:"));
-				setStateView.add(cellID);
-				setStateView.add(new JLabel("Set braille to character:"));
-				setStateView.add(charToSet);
-				JOptionPane.showConfirmDialog(null, setStateView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				appendToFile("/~disp-cell-char:"+cellID.getText()+" "+charToSet.getText()+"\n");
+				if(isScenerio()) {
+					JTextField cellID = new JTextField(2);
+					JTextField charToSet = new JTextField(2);
+					JPanel setStateView = new JPanel();
+					setStateView.add(new JLabel("Braille cell ID:"));
+					setStateView.add(cellID);
+					setStateView.add(new JLabel("Set braille to character:"));
+					setStateView.add(charToSet);
+					JOptionPane.showConfirmDialog(null, setStateView, 
+							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+					appendToFile("/~disp-cell-char:"+cellID.getText()+" "+charToSet.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnSetBrailleCell);
@@ -344,16 +455,20 @@ public class Editor {
 		btnRaiseASingle.setForeground(Color.WHITE);
 		btnRaiseASingle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextField cellID = new JTextField(2);
-				JTextField pinID = new JTextField(2);
-				JPanel setStateView = new JPanel();
-				setStateView.add(new JLabel("Braille cell index:"));
-				setStateView.add(cellID);
-				setStateView.add(new JLabel("Index of pin to raise:"));
-				setStateView.add(pinID);
-				JOptionPane.showConfirmDialog(null, setStateView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				appendToFile("/~disp-cell-raise:"+cellID.getText()+" "+pinID.getText()+"\n");
+				if(isScenerio()) {
+					JTextField cellID = new JTextField(2);
+					JTextField pinID = new JTextField(2);
+					JPanel setStateView = new JPanel();
+					setStateView.add(new JLabel("Braille cell index:"));
+					setStateView.add(cellID);
+					setStateView.add(new JLabel("Index of pin to raise:"));
+					setStateView.add(pinID);
+					JOptionPane.showConfirmDialog(null, setStateView, 
+							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+					appendToFile("/~disp-cell-raise:"+cellID.getText()+" "+pinID.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnRaiseASingle);
@@ -363,29 +478,53 @@ public class Editor {
 		btnLowerASingle.setForeground(Color.WHITE);
 		btnLowerASingle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JTextField cellID = new JTextField(2);
-				JTextField pinID = new JTextField(2);
-				JPanel setStateView = new JPanel();
-				setStateView.add(new JLabel("Braille cell index:"));
-				setStateView.add(cellID);
-				setStateView.add(new JLabel("Index of pin to raise:"));
-				setStateView.add(pinID);
-				JOptionPane.showConfirmDialog(null, setStateView, 
-						"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
-				appendToFile("/~disp-cell-lower:"+cellID.getText()+" "+pinID.getText()+"\n");
+				if(isScenerio()) {
+					JTextField cellID = new JTextField(2);
+					JTextField pinID = new JTextField(2);
+					JPanel setStateView = new JPanel();
+					setStateView.add(new JLabel("Braille cell index:"));
+					setStateView.add(cellID);
+					setStateView.add(new JLabel("Index of pin to raise:"));
+					setStateView.add(pinID);
+					JOptionPane.showConfirmDialog(null, setStateView, 
+							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
+					appendToFile("/~disp-cell-lower:"+cellID.getText()+" "+pinID.getText()+"\n");
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
 			}
 		});
 		frame.getContentPane().add(btnLowerASingle);
-		btnNewButton_13.setBackground(new Color(0, 128, 0));
+
+		JButton btnSaveFile = new JButton("Save File");
+		btnSaveFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(isScenerio()) {
+					if(ifTerminate()>=0) {
+						JOptionPane.showMessageDialog(null, "File '"+currentFile+"' saved successfully");
+						currentFile = null;
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
+			}
+		});
+		btnSaveFile.setBackground(new Color(0, 102, 51));
+		btnSaveFile.setForeground(Color.WHITE);
+		frame.getContentPane().add(btnSaveFile);
+		btnNewButton_13.setBackground(new Color(0, 102, 51));
 		btnNewButton_13.setForeground(Color.WHITE);
 		frame.getContentPane().add(btnNewButton_13);
 	}
 
+	public static boolean isScenerio() {
+		return currentFile!=null;
+	}
 
 	public static void appendToFile(String input) {
 		FileWriter commandFile = null;
 		try {
-			commandFile = new FileWriter("commands.txt",true);
+			commandFile = new FileWriter(currentFile,true);
 			commandFile.write(input);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -398,17 +537,28 @@ public class Editor {
 		}
 	}
 
-	public void ifTerminate() {
-		if(configured) {
-			frame.dispose();
-		} else {
-			int result = JOptionPane.showConfirmDialog(null, "Number of button and cells is not set, are you "
-					+ "sure you want to exit?","Confirm",
-					JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE);
-			if(result == JOptionPane.YES_OPTION){
-				frame.dispose();
-			}
+	public String browseFile() {
+		JFileChooser browseFile = new JFileChooser();
+		browseFile.showOpenDialog(frame);
+		try {
+			return browseFile.getSelectedFile().getPath();
+		} catch(NullPointerException e) {
+			return null;
 		}
 	}
 
+	public int ifTerminate() {
+		if(configured) {
+			return 0;
+		} else if(currentFile==null) {
+			return 1;
+		} else {
+			if(JOptionPane.showConfirmDialog(null, "Number of button and cells is not set, are you "
+					+ "sure you want to continue?","Confirm",
+					JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+				return 2;
+			}
+		}
+		return -1;
+	}
 }
