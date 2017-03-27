@@ -2,13 +2,17 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 import java.awt.event.ActionEvent;
 
 public class Editor {
@@ -58,17 +62,29 @@ public class Editor {
 		JButton btnNewButton = new JButton("Cofiguration");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				configurationView set = new configurationView();
-				//set.main(null);
+				new configurationView();
 			}
 		});
 		frame.getContentPane().add(btnNewButton);
 		
 		
 		JButton btnNewButton_6 = new JButton("Append Text");
+		btnNewButton_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new appendTextView();
+			}
+		});
 		frame.getContentPane().add(btnNewButton_6);
 		
 		JButton btnNewButton_4 = new JButton("Add SFX");
+		btnNewButton_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser browseFile = new JFileChooser();
+				browseFile.showOpenDialog(frame);
+				File selectedFile = browseFile.getSelectedFile();
+				appeandToFile("\nPLAY - "+selectedFile+"\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_4);
 		
 		JButton btnNewButton_2 = new JButton("Command 4");
