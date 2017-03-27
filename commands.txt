@@ -1,3 +1,2 @@
 Braille - 5
 Buttons - 5
-/~repeat-button::50
