@@ -88,8 +88,8 @@ public class configurationView {
                             try {
                                 RandomAccessFile editFile = new RandomAccessFile("commands.txt", "rw");
                                 editFile.seek(0);
-                                editFile.write(("Brailles - "+braille+"\n").getBytes());
-                                editFile.write(("Buttons - "+button+"\n").getBytes());
+                                editFile.write(("Cells "+braille+"\n").getBytes());
+                                editFile.write(("Button "+button+"\n").getBytes());
                                 editFile.close();
                             } catch (IOException e1) {
                                 e1.printStackTrace();

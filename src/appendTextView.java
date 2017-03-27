@@ -52,7 +52,7 @@ public class appendTextView {
 		JButton btnAppendText = new JButton("Append Text");
 		btnAppendText.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Editor.appeandToFile(textArea.getText());
+				Editor.appendToFile(textArea.getText());
 				frame.dispose();
 			}
 		});

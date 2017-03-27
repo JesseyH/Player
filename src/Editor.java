@@ -1,10 +1,9 @@
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -82,28 +81,64 @@ public class Editor {
 				JFileChooser browseFile = new JFileChooser();
 				browseFile.showOpenDialog(frame);
 				File selectedFile = browseFile.getSelectedFile();
-				appeandToFile("\nPLAY - "+selectedFile+"\n");
+				appendToFile("\n/~sound:"+selectedFile+"\n");
 			}
 		});
 		frame.getContentPane().add(btnNewButton_4);
 		
-		JButton btnNewButton_2 = new JButton("Command 4");
+		JButton btnNewButton_2 = new JButton("Pause");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String pauseDuration = JOptionPane.showInputDialog(frame, "Duration of the pause:");
+				appendToFile("/~pause:"+pauseDuration+"\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("Command 5");
+		JButton btnNewButton_3 = new JButton("Set Voice");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String voice = JOptionPane.showInputDialog(frame, "Select a voice for TTS (1,2,3 or 4):");
+				appendToFile("/~set-voice:"+voice+"\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_3);
 		
-		JButton btnNewButton_5 = new JButton("Command 6");
+		JButton btnNewButton_5 = new JButton("Display String");
+		btnNewButton_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String strToDisp = JOptionPane.showInputDialog(frame, "Input string to display using braille cells:");
+				appendToFile("/~disp-string:"+strToDisp+"\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_5);
 		
-		JButton btnNewButton_7 = new JButton("Command 7");
+		JButton btnNewButton_7 = new JButton("Input reapeatable text");
+		btnNewButton_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JTextArea textArea = new JTextArea();
+				JScrollPane scrollable = new JScrollPane(textArea);  
+				textArea.setLineWrap(true);  
+				textArea.setWrapStyleWord(true); 
+				scrollable.setPreferredSize(new Dimension(400,200));
+				JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
+				appendToFile("/~repeat\n"+textArea.getText()+"\n/~endrepeat\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_7);
 
-		JButton btnNewButton_1 = new JButton("Command 8");
+		JButton btnNewButton_1 = new JButton("Set repeat button");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String repeatBtn = JOptionPane.showInputDialog(frame, "Please input index of the button that"
+						+ "will handle repeat functionality");
+				appendToFile("/~repeat-button:"+repeatBtn+"\n");
+			}
+		});
 		frame.getContentPane().add(btnNewButton_1);
 	}
 	
-    public static void appeandToFile(String input) {
+    public static void appendToFile(String input) {
         FileWriter commandFile = null;
         try {
             commandFile = new FileWriter("commands.txt",true);
