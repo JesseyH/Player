@@ -129,8 +129,8 @@ public class Editor {
 		});
 
 		JButton btnCreateNewScenerio = new JButton("Create new scenerio file");
-		btnCreateNewScenerio.setBackground(new Color(0, 0, 51));
-		btnCreateNewScenerio.setForeground(Color.WHITE);
+		btnCreateNewScenerio.setBackground(Color.ORANGE);
+		btnCreateNewScenerio.setForeground(Color.BLACK);
 		btnCreateNewScenerio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(currentFile==null) {
@@ -147,13 +147,14 @@ public class Editor {
 		frame.getContentPane().add(btnCreateNewScenerio);
 
 		JButton btnEditExistingScenerio = new JButton("Edit existing scenerio file");
-		btnEditExistingScenerio.setBackground(new Color(0, 0, 51));
-		btnEditExistingScenerio.setForeground(Color.WHITE);
+		btnEditExistingScenerio.setBackground(Color.ORANGE);
+		btnEditExistingScenerio.setForeground(Color.BLACK);
 		btnEditExistingScenerio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!isScenerio()) {
-					if(browseFile()!=null) {
-						currentFile = browseFile();
+					String file = browseFile();
+					if(file!=null) {
+						currentFile = file;
 						JOptionPane.showMessageDialog(null, "Scenerio file '"+currentFile+"' is selected");
 					} else {
 						JOptionPane.showMessageDialog(null, "No file selected");
@@ -164,10 +165,31 @@ public class Editor {
 			}
 		});
 		frame.getContentPane().add(btnEditExistingScenerio);
+		
+		JButton btnClearScenerioFile = new JButton("Clear scenerio file");
+		btnClearScenerioFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(isScenerio()) {
+					File file = new File(currentFile);
+					file.delete();
+					try {
+						file.createNewFile();
+						JOptionPane.showMessageDialog(null, "'"+file.getName()+"' cleared successfully!");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "No scenerio file");
+				}
+			}
+		});
+		btnClearScenerioFile.setForeground(Color.BLACK);
+		btnClearScenerioFile.setBackground(Color.ORANGE);
+		frame.getContentPane().add(btnClearScenerioFile);
 		frame.getContentPane().add(btnNewButton);
 
 
-		JButton btnNewButton_6 = new JButton("Append Text");
+		JButton btnNewButton_6 = new JButton("Insert text into file");
 		btnNewButton_6.setBackground(new Color(0, 0, 51));
 		btnNewButton_6.setForeground(Color.WHITE);
 		btnNewButton_6.addActionListener(new ActionListener() {
@@ -187,14 +209,12 @@ public class Editor {
 		});
 		frame.getContentPane().add(btnNewButton_6);
 
-		JButton btnNewButton_4 = new JButton("Add SFX");
+		JButton btnNewButton_4 = new JButton("Add sound");
 		btnNewButton_4.setBackground(new Color(0, 0, 51));
 		btnNewButton_4.setForeground(Color.WHITE);
 		btnNewButton_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenerio()) {
-					JFileChooser browseFile = new JFileChooser();
-					browseFile.showOpenDialog(frame);
 					appendToFile("\n/~sound:"+browseFile()+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenerio file");
@@ -203,7 +223,7 @@ public class Editor {
 		});
 		frame.getContentPane().add(btnNewButton_4);
 
-		JButton btnNewButton_2 = new JButton("Pause");
+		JButton btnNewButton_2 = new JButton("Add pause with duration");
 		btnNewButton_2.setBackground(new Color(0, 0, 51));
 		btnNewButton_2.setForeground(Color.WHITE);
 		btnNewButton_2.addActionListener(new ActionListener() {
@@ -218,7 +238,7 @@ public class Editor {
 		});
 		frame.getContentPane().add(btnNewButton_2);
 
-		JButton btnNewButton_3 = new JButton("Set Voice");
+		JButton btnNewButton_3 = new JButton("Set text-to-speech voice");
 		btnNewButton_3.setBackground(new Color(0, 0, 51));
 		btnNewButton_3.setForeground(Color.WHITE);
 		btnNewButton_3.addActionListener(new ActionListener() {
@@ -231,7 +251,7 @@ public class Editor {
 		});
 		frame.getContentPane().add(btnNewButton_3);
 
-		JButton btnNewButton_5 = new JButton("Display String");
+		JButton btnNewButton_5 = new JButton("Display a message using braille cells");
 		btnNewButton_5.setBackground(new Color(0, 0, 51));
 		btnNewButton_5.setForeground(Color.WHITE);
 		btnNewButton_5.addActionListener(new ActionListener() {
@@ -266,7 +286,7 @@ public class Editor {
 		});
 		frame.getContentPane().add(btnNewButton_7);
 
-		JButton btnNewButton_1 = new JButton("Set repeat button");
+		JButton btnNewButton_1 = new JButton("Assign repeat function to a button");
 		btnNewButton_1.setBackground(new Color(0, 0, 51));
 		btnNewButton_1.setForeground(Color.WHITE);
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -367,8 +387,8 @@ public class Editor {
 		btnNewButton_13.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(isScenerio()) {
-					if(ifTerminate()==0) frame.dispose();
-					else if(ifTerminate()==2) JOptionPane.showMessageDialog(null, "No scenerio file is created");
+					int returnCode = ifTerminate();
+					if(returnCode==0 || returnCode==2) frame.dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenerio file");
 				}
