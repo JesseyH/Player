@@ -17,9 +17,10 @@ import java.awt.Toolkit;
 
 public class Editor {
 
-	private JFrame frame;
+	private JFrame Editor;
 	boolean configured = false;
 	static String currentFile = null;
+	int btnAmt=0, cellAmt=0;
 
 	/**
 	 * Launch the application.
@@ -29,7 +30,7 @@ public class Editor {
 			public void run() {
 				try {
 					Editor window = new Editor();
-					window.frame.setVisible(true);
+					window.Editor.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -44,21 +45,27 @@ public class Editor {
 		initialize();
 	}
 
-	public String createScenerio(String fileName) {
+	/**
+	 * Creating scenario file
+	 */
+	public String createScenario(String fileName) {
 		try {
 			PrintWriter writer = new PrintWriter(fileName+".txt");
 			currentFile = fileName+".txt";
 			writer.close();
 		} catch (FileNotFoundException e) {
-
+			JOptionPane.showMessageDialog(null, "Unable to create scenario file");
 		}
 		return null;
 	}
 
-	private void config() {
+	/**
+	 * Adding/Editing buttons and braille cells configuration at the beginning of the scenario file.
+	 */
+	private int[] config() {
 		BufferedReader readExistingLines;
-		JTextField nButtons = new JTextField(2);
-		JTextField nCells = new JTextField(15);
+		JTextField nButtons = new JTextField(3);
+		JTextField nCells = new JTextField(3);
 		JPanel skioLineView = new JPanel();
 		skioLineView.add(new JLabel("Number of buttons:"));
 		skioLineView.add(nButtons);
@@ -68,8 +75,9 @@ public class Editor {
 				"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 		if (nCells.getText().length()!=0 || nButtons.getText().length()!=0) {
 			try {
-				int braille = Integer.parseInt(nCells.getText()),
-						button = Integer.parseInt(nButtons.getText());
+				int braille = Integer.parseInt(nCells.getText()), button = Integer.parseInt(nButtons.getText());
+				btnAmt = button;
+				cellAmt = braille;
 				if (braille>0 && button>0) {
 					try {
 						readExistingLines = new BufferedReader(new FileReader(currentFile));
@@ -85,91 +93,99 @@ public class Editor {
 						bufferedWriter.flush();
 						bufferedWriter.close();
 						configured = true;
-
+						return new int[] {braille,button};
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-				} else JOptionPane.showMessageDialog(null,"Both inputs must be greater than 0");
+				} else {
+					JOptionPane.showMessageDialog(null,"Both inputs must be greater than 0");
+					return null;
+				}
 			} catch (NumberFormatException x) {
 				JOptionPane.showMessageDialog(null,"Both inputs must be integer");
+				return null;
 			}
 		} else {
-			if (result == JOptionPane.OK_OPTION) 
+			if (result == JOptionPane.OK_OPTION) {
 				JOptionPane.showMessageDialog(null,"Please enter number of braille cells and buttons");
+				return null;
+			}
 		}
+		return null;
 	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame("Authoring");
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
-		frame.setBounds(100, 100, 650, 350);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		Editor = new JFrame("Authoring");
+		Editor.setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
+		Editor.setBounds(100, 100, 650, 350);
+		Editor.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		Editor.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				if(ifTerminate()>=0) frame.dispose();
+				if(ifTerminate()>=0) Editor.dispose();
 			}
 		});
-		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
+		Editor.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
 
-		JButton btnNewButton = new JButton("Edit cofiguration");
-		btnNewButton.setBackground(new Color(0, 0, 51));
-		btnNewButton.setForeground(Color.WHITE);
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton editConfig = new JButton("Edit cofiguration");
+		editConfig.setBackground(new Color(0, 0, 51));
+		editConfig.setForeground(Color.WHITE);
+		editConfig.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					config();
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
 
-		JButton btnCreateNewScenerio = new JButton("Create new scenerio file");
-		btnCreateNewScenerio.setBackground(Color.ORANGE);
-		btnCreateNewScenerio.setForeground(Color.BLACK);
-		btnCreateNewScenerio.addActionListener(new ActionListener() {
+		JButton newScenario = new JButton("Create new scenario file");
+		newScenario.setBackground(Color.ORANGE);
+		newScenario.setForeground(Color.BLACK);
+		newScenario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(currentFile==null) {
-					String fileName = JOptionPane.showInputDialog(frame, "Name of scenerio file:");
+					String fileName = JOptionPane.showInputDialog(Editor, "Name of scenario file:");
 					if(fileName!=null && fileName.length()>0) {
-						createScenerio(fileName);
-						JOptionPane.showMessageDialog(null,"Scenerio file \""+currentFile+"\" is created");
+						createScenario(fileName);
+						JOptionPane.showMessageDialog(null,"Scenario file \""+currentFile+"\" is created");
 					}
 				} else {
-					JOptionPane.showMessageDialog(null,"Scenerio file alredy exists - "+currentFile);
+					JOptionPane.showMessageDialog(null,"Scenario file alredy exists - "+currentFile);
 				}
 			}
 		});
-		frame.getContentPane().add(btnCreateNewScenerio);
+		Editor.getContentPane().add(newScenario);
 
-		JButton btnEditExistingScenerio = new JButton("Edit existing scenerio file");
-		btnEditExistingScenerio.setBackground(Color.ORANGE);
-		btnEditExistingScenerio.setForeground(Color.BLACK);
-		btnEditExistingScenerio.addActionListener(new ActionListener() {
+		JButton editScenario = new JButton("Edit existing scenario file");
+		editScenario.setBackground(Color.ORANGE);
+		editScenario.setForeground(Color.BLACK);
+		editScenario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!isScenerio()) {
+				if(!isScenario()) {
 					String file = browseFile();
 					if(file!=null) {
 						currentFile = file;
-						JOptionPane.showMessageDialog(null, "Scenerio file '"+currentFile+"' is selected");
+						JOptionPane.showMessageDialog(null, "Scenario file '"+currentFile+"' is selected");
 					} else {
 						JOptionPane.showMessageDialog(null, "No file selected");
 					}
 				} else {
-					JOptionPane.showMessageDialog(null, "Scenerio file already exists");
+					JOptionPane.showMessageDialog(null, "Scenario file already exists");
 				}
 			}
 		});
-		frame.getContentPane().add(btnEditExistingScenerio);
+		Editor.getContentPane().add(editScenario);
 		
-		JButton btnClearScenerioFile = new JButton("Clear scenerio file");
-		btnClearScenerioFile.addActionListener(new ActionListener() {
+		JButton clearScenario = new JButton("Clear scenario file");
+		clearScenario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					File file = new File(currentFile);
 					file.delete();
 					try {
@@ -179,22 +195,22 @@ public class Editor {
 						e.printStackTrace();
 					}
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnClearScenerioFile.setForeground(Color.BLACK);
-		btnClearScenerioFile.setBackground(Color.ORANGE);
-		frame.getContentPane().add(btnClearScenerioFile);
-		frame.getContentPane().add(btnNewButton);
+		clearScenario.setForeground(Color.BLACK);
+		clearScenario.setBackground(Color.ORANGE);
+		Editor.getContentPane().add(clearScenario);
+		Editor.getContentPane().add(editConfig);
 
 
-		JButton btnNewButton_6 = new JButton("Insert text into file");
-		btnNewButton_6.setBackground(new Color(0, 0, 51));
-		btnNewButton_6.setForeground(Color.WHITE);
-		btnNewButton_6.addActionListener(new ActionListener() {
+		JButton addText = new JButton("Insert text into file");
+		addText.setBackground(new Color(0, 0, 51));
+		addText.setForeground(Color.WHITE);
+		addText.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextArea textArea = new JTextArea();
 					JScrollPane scrollable = new JScrollPane(textArea);  
 					textArea.setLineWrap(true);  
@@ -203,75 +219,75 @@ public class Editor {
 					JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
 					if(textArea.getText().length()>0) appendToFile(textArea.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_6);
+		Editor.getContentPane().add(addText);
 
-		JButton btnNewButton_4 = new JButton("Add sound");
-		btnNewButton_4.setBackground(new Color(0, 0, 51));
-		btnNewButton_4.setForeground(Color.WHITE);
-		btnNewButton_4.addActionListener(new ActionListener() {
+		JButton addSound = new JButton("Add sound");
+		addSound.setBackground(new Color(0, 0, 51));
+		addSound.setForeground(Color.WHITE);
+		addSound.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					appendToFile("\n/~sound:"+browseFile()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_4);
+		Editor.getContentPane().add(addSound);
 
-		JButton btnNewButton_2 = new JButton("Add pause with duration");
-		btnNewButton_2.setBackground(new Color(0, 0, 51));
-		btnNewButton_2.setForeground(Color.WHITE);
-		btnNewButton_2.addActionListener(new ActionListener() {
+		JButton addPause = new JButton("Add pause with duration");
+		addPause.setBackground(new Color(0, 0, 51));
+		addPause.setForeground(Color.WHITE);
+		addPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
-					String pauseDuration = JOptionPane.showInputDialog(frame, "Duration of the pause:");
+				if(isScenario()) {
+					String pauseDuration = JOptionPane.showInputDialog(Editor, "Duration of the pause:");
 					appendToFile("/~pause:"+pauseDuration+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_2);
+		Editor.getContentPane().add(addPause);
 
-		JButton btnNewButton_3 = new JButton("Set text-to-speech voice");
-		btnNewButton_3.setBackground(new Color(0, 0, 51));
-		btnNewButton_3.setForeground(Color.WHITE);
-		btnNewButton_3.addActionListener(new ActionListener() {
+		JButton setVoice = new JButton("Set text-to-speech voice");
+		setVoice.setBackground(new Color(0, 0, 51));
+		setVoice.setForeground(Color.WHITE);
+		setVoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
-					String voice = JOptionPane.showInputDialog(frame, "Select a voice for TTS (1,2,3 or 4):");
+				if(isScenario()) {
+					String voice = JOptionPane.showInputDialog(Editor, "Select a voice for TTS (1,2,3 or 4):");
 					appendToFile("/~set-voice:"+voice+"\n");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_3);
+		Editor.getContentPane().add(setVoice);
 
-		JButton btnNewButton_5 = new JButton("Display a message using braille cells");
-		btnNewButton_5.setBackground(new Color(0, 0, 51));
-		btnNewButton_5.setForeground(Color.WHITE);
-		btnNewButton_5.addActionListener(new ActionListener() {
+		JButton dispMsg = new JButton("Display a message using braille cells");
+		dispMsg.setBackground(new Color(0, 0, 51));
+		dispMsg.setForeground(Color.WHITE);
+		dispMsg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
-					String strToDisp = JOptionPane.showInputDialog(frame, "Input string to display using braille cells:");
+				if(isScenario()) {
+					String strToDisp = JOptionPane.showInputDialog(Editor, "Input string to display using braille cells:");
 					appendToFile("/~disp-string:"+strToDisp+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_5);
+		Editor.getContentPane().add(dispMsg);
 
-		JButton btnNewButton_7 = new JButton("Add reapeatable text");
-		btnNewButton_7.setBackground(new Color(0, 0, 51));
-		btnNewButton_7.setForeground(Color.WHITE);
-		btnNewButton_7.addActionListener(new ActionListener() {
+		JButton repeatableText = new JButton("Add reapeatable text");
+		repeatableText.setBackground(new Color(0, 0, 51));
+		repeatableText.setForeground(Color.WHITE);
+		repeatableText.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextArea textArea = new JTextArea();
 					JScrollPane scrollable = new JScrollPane(textArea);  
 					textArea.setLineWrap(true);  
@@ -280,64 +296,64 @@ public class Editor {
 					JOptionPane.showMessageDialog(null, scrollable, "Repeatable texts",JOptionPane.YES_NO_OPTION);
 					appendToFile("/~repeat\n"+textArea.getText()+"\n/~endrepeat\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_7);
+		Editor.getContentPane().add(repeatableText);
 
-		JButton btnNewButton_1 = new JButton("Assign repeat function to a button");
-		btnNewButton_1.setBackground(new Color(0, 0, 51));
-		btnNewButton_1.setForeground(Color.WHITE);
-		btnNewButton_1.addActionListener(new ActionListener() {
+		JButton repeatButton = new JButton("Assign repeat function to a button press");
+		repeatButton.setBackground(new Color(0, 0, 51));
+		repeatButton.setForeground(Color.WHITE);
+		repeatButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
-					String repeatBtn = JOptionPane.showInputDialog(frame, "Please input index of the button that"
-							+ "will handle repeat functionality");
+				if(isScenario()) {
+					String repeatBtn = JOptionPane.showInputDialog(Editor, "Index of the button that"
+							+ " will handle repeat functionality:");
 					appendToFile("/~repeat-button:"+repeatBtn+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_1);
+		Editor.getContentPane().add(repeatButton);
 
-		JButton btnNewButton_8 = new JButton("Add target line for skip functionality");
-		btnNewButton_8.addActionListener(new ActionListener() {
+		JButton skipLine = new JButton("Add target line for skip functionality");
+		skipLine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(isScenerio()) {
-					String skipTarget = JOptionPane.showInputDialog(frame, "Line identifier:");
+				if(isScenario()) {
+					String skipTarget = JOptionPane.showInputDialog(Editor, "Target line identifier:");
 					appendToFile("/~"+skipTarget+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnNewButton_8.setBackground(new Color(0, 0, 51));
-		btnNewButton_8.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_8);
+		skipLine.setBackground(new Color(0, 0, 51));
+		skipLine.setForeground(Color.WHITE);
+		Editor.getContentPane().add(skipLine);
 
-		JButton btnNewButton_9 = new JButton("Skip to target line in file");
-		btnNewButton_9.addActionListener(new ActionListener() {
+		JButton skipToTarget = new JButton("Skip to target line in file");
+		skipToTarget.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(isScenerio()) {
-					String targetLine = JOptionPane.showInputDialog(frame, "Target line identifier:");
+				if(isScenario()) {
+					String targetLine = JOptionPane.showInputDialog(Editor, "Target line identifier:");
 					appendToFile("/~skip:"+targetLine+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnNewButton_9.setBackground(new Color(0, 0, 51));
-		btnNewButton_9.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_9);
+		skipToTarget.setBackground(new Color(0, 0, 51));
+		skipToTarget.setForeground(Color.WHITE);
+		Editor.getContentPane().add(skipToTarget);
 
-		JButton btnNewButton_10 = new JButton("Assign button to skip to line");
-		btnNewButton_10.addActionListener(new ActionListener() {
+		JButton skipButton = new JButton("Assign button to skip to line");
+		skipButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextField buttonID = new JTextField(2);
-					JTextField skipID = new JTextField(2);
+					JTextField skipID = new JTextField(10);
 					JPanel skioLineView = new JPanel();
 					skioLineView.add(new JLabel("Button ID:"));
 					skioLineView.add(buttonID);
@@ -347,89 +363,89 @@ public class Editor {
 							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 					appendToFile("/~skip-button:"+buttonID.getText()+" "+skipID.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnNewButton_10.setBackground(new Color(0, 0, 51));
-		btnNewButton_10.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_10);
+		skipButton.setBackground(new Color(0, 0, 51));
+		skipButton.setForeground(Color.WHITE);
+		Editor.getContentPane().add(skipButton);
 
-		JButton btnNewButton_11 = new JButton("Request user input(button press)");
-		btnNewButton_11.addActionListener(new ActionListener() {
+		JButton getInput = new JButton("Request user input(button press)");
+		getInput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					appendToFile("/~user-input\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnNewButton_11.setBackground(new Color(0, 0, 51));
-		btnNewButton_11.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_11);
+		getInput.setBackground(new Color(0, 0, 51));
+		getInput.setForeground(Color.WHITE);
+		Editor.getContentPane().add(getInput);
 
-		JButton btnNewButton_12 = new JButton("Reset all the buttons");
-		btnNewButton_12.addActionListener(new ActionListener() {
+		JButton resetBtns = new JButton("Reset all the buttons");
+		resetBtns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					appendToFile("/~reset-buttons\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnNewButton_12.setBackground(new Color(0, 0, 51));
-		btnNewButton_12.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_12);
+		resetBtns.setBackground(new Color(0, 0, 51));
+		resetBtns.setForeground(Color.WHITE);
+		Editor.getContentPane().add(resetBtns);
 
-		JButton btnNewButton_13 = new JButton("Save and Exit");
-		btnNewButton_13.addActionListener(new ActionListener() {
+		JButton saveAndExit = new JButton("Save and Exit");
+		saveAndExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					int returnCode = ifTerminate();
-					if(returnCode==0 || returnCode==2) frame.dispose();
+					if(returnCode==0 || returnCode==2) Editor.dispose();
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
 
-		JButton btnNewButton_14 = new JButton("Clear all braille cells");
-		btnNewButton_14.setBackground(new Color(0, 0, 51));
-		btnNewButton_14.setForeground(Color.WHITE);
-		btnNewButton_14.addActionListener(new ActionListener() {
+		JButton clrCells = new JButton("Clear all braille cells");
+		clrCells.setBackground(new Color(0, 0, 51));
+		clrCells.setForeground(Color.WHITE);
+		clrCells.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					appendToFile("/~disp-clearAll\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_14);
+		Editor.getContentPane().add(clrCells);
 
-		JButton btnNewButton_15 = new JButton("Clear a single braille cell using ID");
-		btnNewButton_15.setBackground(new Color(0, 0, 51));
-		btnNewButton_15.setForeground(Color.WHITE);
-		btnNewButton_15.addActionListener(new ActionListener() {
+		JButton clrACell = new JButton("Clear a single braille cell using ID");
+		clrACell.setBackground(new Color(0, 0, 51));
+		clrACell.setForeground(Color.WHITE);
+		clrACell.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
-					String clearID = JOptionPane.showInputDialog(frame, "Clear braille cell with ID:");
+				if(isScenario()) {
+					String clearID = JOptionPane.showInputDialog(Editor, "Clear braille cell with ID:");
 					appendToFile("/~disp-clear-cell:"+clearID+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_15);
+		Editor.getContentPane().add(clrACell);
 
-		JButton btnNewButton_16 = new JButton("Set braille cell state");
-		btnNewButton_16.setBackground(new Color(0, 0, 51));
-		btnNewButton_16.setForeground(Color.WHITE);
-		btnNewButton_16.addActionListener(new ActionListener() {
+		JButton setACell = new JButton("Set braille cell state");
+		setACell.setBackground(new Color(0, 0, 51));
+		setACell.setForeground(Color.WHITE);
+		setACell.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextField cellID = new JTextField(2);
 					JTextField state = new JTextField(15);
 					JPanel setStateView = new JPanel();
@@ -441,18 +457,18 @@ public class Editor {
 							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 					appendToFile("/~disp-cell-pins:"+cellID.getText()+" "+state.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnNewButton_16);
+		Editor.getContentPane().add(setACell);
 
-		JButton btnSetBrailleCell = new JButton("Set braille cell to display a character");
-		btnSetBrailleCell.setBackground(new Color(0, 0, 51));
-		btnSetBrailleCell.setForeground(Color.WHITE);
-		btnSetBrailleCell.addActionListener(new ActionListener() {
+		JButton dispChar = new JButton("Set braille cell to display a character");
+		dispChar.setBackground(new Color(0, 0, 51));
+		dispChar.setForeground(Color.WHITE);
+		dispChar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextField cellID = new JTextField(2);
 					JTextField charToSet = new JTextField(2);
 					JPanel setStateView = new JPanel();
@@ -464,18 +480,18 @@ public class Editor {
 							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 					appendToFile("/~disp-cell-char:"+cellID.getText()+" "+charToSet.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnSetBrailleCell);
+		Editor.getContentPane().add(dispChar);
 
-		JButton btnRaiseASingle = new JButton("Raise a single pin of single braille cell");
-		btnRaiseASingle.setBackground(new Color(0, 0, 51));
-		btnRaiseASingle.setForeground(Color.WHITE);
-		btnRaiseASingle.addActionListener(new ActionListener() {
+		JButton raisePin = new JButton("Raise a single pin of single braille cell");
+		raisePin.setBackground(new Color(0, 0, 51));
+		raisePin.setForeground(Color.WHITE);
+		raisePin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextField cellID = new JTextField(2);
 					JTextField pinID = new JTextField(2);
 					JPanel setStateView = new JPanel();
@@ -487,18 +503,18 @@ public class Editor {
 							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 					appendToFile("/~disp-cell-raise:"+cellID.getText()+" "+pinID.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnRaiseASingle);
+		Editor.getContentPane().add(raisePin);
 
-		JButton btnLowerASingle = new JButton("Lower a single pin of single cell");
-		btnLowerASingle.setBackground(new Color(0, 0, 51));
-		btnLowerASingle.setForeground(Color.WHITE);
-		btnLowerASingle.addActionListener(new ActionListener() {
+		JButton lowerPin = new JButton("Lower a single pin of single cell");
+		lowerPin.setBackground(new Color(0, 0, 51));
+		lowerPin.setForeground(Color.WHITE);
+		lowerPin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					JTextField cellID = new JTextField(2);
 					JTextField pinID = new JTextField(2);
 					JPanel setStateView = new JPanel();
@@ -510,37 +526,44 @@ public class Editor {
 							"Skip to a line using button press", JOptionPane.OK_CANCEL_OPTION);
 					appendToFile("/~disp-cell-lower:"+cellID.getText()+" "+pinID.getText()+"\n");
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		frame.getContentPane().add(btnLowerASingle);
+		Editor.getContentPane().add(lowerPin);
 
-		JButton btnSaveFile = new JButton("Save File");
-		btnSaveFile.addActionListener(new ActionListener() {
+		JButton saveFile = new JButton("Save File");
+		saveFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(isScenerio()) {
+				if(isScenario()) {
 					if(ifTerminate()>=0) {
 						JOptionPane.showMessageDialog(null, "File '"+currentFile+"' saved successfully");
 						currentFile = null;
 					}
 				} else {
-					JOptionPane.showMessageDialog(null, "No scenerio file");
+					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		btnSaveFile.setBackground(new Color(0, 102, 51));
-		btnSaveFile.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnSaveFile);
-		btnNewButton_13.setBackground(new Color(0, 102, 51));
-		btnNewButton_13.setForeground(Color.WHITE);
-		frame.getContentPane().add(btnNewButton_13);
+		saveFile.setBackground(new Color(0, 102, 51));
+		saveFile.setForeground(Color.WHITE);
+		Editor.getContentPane().add(saveFile);
+		saveAndExit.setBackground(new Color(0, 102, 51));
+		saveAndExit.setForeground(Color.WHITE);
+		Editor.getContentPane().add(saveAndExit);
 	}
-
-	public static boolean isScenerio() {
+	/**
+	 * Checks to see if there is scenario file opened and ready to be edited
+	 * @return True - if there exist scenario file; False - Otherwise
+	 */
+	public static boolean isScenario() {
 		return currentFile!=null;
 	}
-
+	
+	/**
+	 * Append text to scenario file
+	 * @param input - Text to append
+	 */
 	public static void appendToFile(String input) {
 		FileWriter commandFile = null;
 		try {
@@ -557,23 +580,33 @@ public class Editor {
 		}
 	}
 
+	/**
+	 * Browse and open file
+	 * @return path of the file selected
+	 */
 	public String browseFile() {
 		JFileChooser browseFile = new JFileChooser();
-		browseFile.showOpenDialog(frame);
+		browseFile.showOpenDialog(Editor);
 		try {
 			return browseFile.getSelectedFile().getPath();
 		} catch(NullPointerException e) {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * Check to see if program should be or should not be closed based on user input and state of the program
+	 * @return Close codes: 0 - OK to terminate without prompt; 1 - OK to close, but not save;
+	 *  2 - Prompt user if it is OK to close the program and save file;
+	 *  -1 - OK to terminate but not save
+	 */
 	public int ifTerminate() {
 		if(configured) {
 			return 0;
 		} else if(currentFile==null) {
 			return 1;
 		} else {
-			if(JOptionPane.showConfirmDialog(null, "Number of button and cells is not set, are you "
+			if(JOptionPane.showConfirmDialog(null, "Number of buttons and cells is not configured, are you "
 					+ "sure you want to continue?","Confirm",
 					JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 				return 2;
@@ -581,4 +614,55 @@ public class Editor {
 		}
 		return -1;
 	}
+	
+	/**
+	 * Check if input provided is integer
+	 * @param testValue - value to test
+	 * @return True - If testValue is integer; False - Otherwise
+	 */
+	public boolean isInt(String testValue) {
+		try {
+			getInt(testValue);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * Check to see if testValue provided as input is single character
+	 * @param testValue
+	 * @return True - If testValue is single character; False - Otherwise
+	 */
+	public boolean isChar(String testValue) {
+		return testValue.length()==1;
+	}
+	
+	/**
+	 * Check to see if testValue provided as input is correct cell value (i.e. it's within range of existing cells)
+	 * @param testValue
+	 * @return True - if testValue referring to cell exists; False - Otherwise
+	 */
+	public boolean isValidCell(String testValue) {
+		return Integer.parseInt(testValue)<=cellAmt;
+	}
+	
+	/**
+	 * Check to see if testValue provided as input is correct button value (i.e. it's within range of existing buttons)
+	 * @param testValue
+	 * @return True - if testValue referring to button exists; False - Otherwise
+	 */
+	public boolean isValidBtn(String testValue) {
+		return Integer.parseInt(testValue)<=btnAmt;
+	}
+	
+	/**
+	 * Converts string to integer
+	 * @param value - String to be converted to integer
+	 * @return integer value corresponding to string input "value"
+	 */
+	public int getInt(String value) {
+		return Integer.parseInt(value);
+	}
+	
 }
