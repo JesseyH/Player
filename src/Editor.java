@@ -18,7 +18,6 @@ import java.awt.Toolkit;
 public class Editor {
 
 	private JFrame Editor;
-	boolean configured = false;
 	static String currentFile = null;
 	int btnAmt=0, cellAmt=0;
 
@@ -83,16 +82,15 @@ public class Editor {
 						readExistingLines = new BufferedReader(new FileReader(currentFile));
 						String line, finalOut = "";
 						while((line = readExistingLines.readLine())!=null) {
-							if (!line.matches("Cell \\d+") && !line.matches("Button \\d+")) finalOut+=line+"\n";
+							if (!line.matches("Cells \\d+") && !line.matches("Button \\d+")) finalOut+=line+"\n";
 						}
 						FileWriter fileWriter = new FileWriter(currentFile);
 						BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-						bufferedWriter.write("Cell "+braille+"\n");
+						bufferedWriter.write("Cells "+braille+"\n");
 						bufferedWriter.write("Button "+button+"\n");
 						bufferedWriter.write(finalOut);
 						bufferedWriter.flush();
 						bufferedWriter.close();
-						configured = true;
 						return new int[] {braille,button};
 					} catch (IOException e1) {
 						e1.printStackTrace();
@@ -532,7 +530,7 @@ public class Editor {
 		});
 		Editor.getContentPane().add(lowerPin);
 
-		JButton saveFile = new JButton("Save File");
+		JButton saveFile = new JButton("Save and close file");
 		saveFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
@@ -601,7 +599,7 @@ public class Editor {
 	 *  -1 - OK to terminate but not save
 	 */
 	public int ifTerminate() {
-		if(configured) {
+		if(isConfigured()) {
 			return 0;
 		} else if(currentFile==null) {
 			return 1;
@@ -663,6 +661,22 @@ public class Editor {
 	 */
 	public int getInt(String value) {
 		return Integer.parseInt(value);
+	}
+	
+	/**
+	 * Check to see if braille and button configuration are present in file
+	 * @return True - configuration exists in file; False - otherwise
+	 */
+	@SuppressWarnings("resource")
+	public boolean isConfigured() {
+		try {
+			BufferedReader readExistingLines = new BufferedReader(new FileReader(currentFile));
+			if(readExistingLines.readLine().matches("Cells \\d+") 
+					&& readExistingLines.readLine().matches("Button \\d+")) return true;
+		} catch (Exception e) {
+			return false;
+		}
+		return false;
 	}
 	
 }
