@@ -1,5 +1,8 @@
+package main;
+
 import java.awt.EventQueue;
 import javax.swing.*;
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
@@ -17,7 +20,7 @@ import java.awt.Toolkit;
 
 public class Editor {
 
-	private JFrame Editor;
+	private static JFrame editor;
 	static String currentFile = null;
 	int btnAmt=0, cellAmt=0;
 
@@ -29,12 +32,20 @@ public class Editor {
 			public void run() {
 				try {
 					Editor window = new Editor();
-					window.Editor.setVisible(true);
+					window.editor.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Retrieve the editor's JFrame instance currently in use.
+	 * @return
+	 */
+	public static JFrame getEditor() {
+		return editor;
 	}
 
 	/**
@@ -116,17 +127,17 @@ public class Editor {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		Editor = new JFrame("Authoring");
-		Editor.setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
-		Editor.setBounds(100, 100, 650, 350);
-		Editor.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		Editor.addWindowListener(new java.awt.event.WindowAdapter() {
+		editor = new JFrame("Authoring");
+		editor.setIconImage(Toolkit.getDefaultToolkit().getImage("icon.png"));
+		editor.setBounds(100, 100, 650, 350);
+		editor.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		editor.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				if(ifTerminate()>=0) Editor.dispose();
+				if(ifTerminate()>=0) editor.dispose();
 			}
 		});
-		Editor.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
+		editor.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
 
 		JButton editConfig = new JButton("Edit cofiguration");
 		editConfig.setBackground(new Color(0, 0, 51));
@@ -147,18 +158,23 @@ public class Editor {
 		newScenario.setForeground(Color.BLACK);
 		newScenario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(currentFile==null) {
-					String fileName = JOptionPane.showInputDialog(Editor, "Name of scenario file:");
-					if(fileName!=null && fileName.length()>0) {
-						createScenario(fileName);
-						JOptionPane.showMessageDialog(null,"Scenario file \""+currentFile+"\" is created");
+				if(!isScenario()) {
+					if(currentFile==null) {
+						String fileName = JOptionPane.showInputDialog(editor, "Name of scenario file:");
+						if(fileName!=null && fileName.length()>0) {
+							createScenario(fileName);
+							JOptionPane.showMessageDialog(null,"Scenario file \""+currentFile+"\" is created");
+						}
+					} else {
+						JOptionPane.showMessageDialog(null,"Scenario file alredy exists - "+currentFile);
 					}
 				} else {
-					JOptionPane.showMessageDialog(null,"Scenario file alredy exists - "+currentFile);
+					JOptionPane.showMessageDialog(null, "Scenario file already exists");
 				}
 			}
 		});
-		Editor.getContentPane().add(newScenario);
+		
+		editor.getContentPane().add(newScenario);
 
 		JButton editScenario = new JButton("Edit existing scenario file");
 		editScenario.setBackground(Color.ORANGE);
@@ -178,7 +194,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(editScenario);
+		editor.getContentPane().add(editScenario);
 		
 		JButton clearScenario = new JButton("Clear scenario file");
 		clearScenario.addActionListener(new ActionListener() {
@@ -199,8 +215,8 @@ public class Editor {
 		});
 		clearScenario.setForeground(Color.BLACK);
 		clearScenario.setBackground(Color.ORANGE);
-		Editor.getContentPane().add(clearScenario);
-		Editor.getContentPane().add(editConfig);
+		editor.getContentPane().add(clearScenario);
+		editor.getContentPane().add(editConfig);
 
 
 		JButton addText = new JButton("Insert text into file");
@@ -221,7 +237,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(addText);
+		editor.getContentPane().add(addText);
 
 		JButton addSound = new JButton("Add sound");
 		addSound.setBackground(new Color(0, 0, 51));
@@ -235,7 +251,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(addSound);
+		editor.getContentPane().add(addSound);
 
 		JButton addPause = new JButton("Add pause with duration");
 		addPause.setBackground(new Color(0, 0, 51));
@@ -243,14 +259,14 @@ public class Editor {
 		addPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
-					String pauseDuration = JOptionPane.showInputDialog(Editor, "Duration of the pause:");
+					String pauseDuration = JOptionPane.showInputDialog(editor, "Duration of the pause:");
 					appendToFile("/~pause:"+pauseDuration+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		Editor.getContentPane().add(addPause);
+		editor.getContentPane().add(addPause);
 
 		JButton setVoice = new JButton("Set text-to-speech voice");
 		setVoice.setBackground(new Color(0, 0, 51));
@@ -258,12 +274,12 @@ public class Editor {
 		setVoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
-					String voice = JOptionPane.showInputDialog(Editor, "Select a voice for TTS (1,2,3 or 4):");
+					String voice = JOptionPane.showInputDialog(editor, "Select a voice for TTS (1,2,3 or 4):");
 					appendToFile("/~set-voice:"+voice+"\n");
 				}
 			}
 		});
-		Editor.getContentPane().add(setVoice);
+		editor.getContentPane().add(setVoice);
 
 		JButton dispMsg = new JButton("Display a message using braille cells");
 		dispMsg.setBackground(new Color(0, 0, 51));
@@ -271,14 +287,14 @@ public class Editor {
 		dispMsg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
-					String strToDisp = JOptionPane.showInputDialog(Editor, "Input string to display using braille cells:");
+					String strToDisp = JOptionPane.showInputDialog(editor, "Input string to display using braille cells:");
 					appendToFile("/~disp-string:"+strToDisp+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		Editor.getContentPane().add(dispMsg);
+		editor.getContentPane().add(dispMsg);
 
 		JButton repeatableText = new JButton("Add reapeatable text");
 		repeatableText.setBackground(new Color(0, 0, 51));
@@ -298,7 +314,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(repeatableText);
+		editor.getContentPane().add(repeatableText);
 
 		JButton repeatButton = new JButton("Assign repeat function to a button press");
 		repeatButton.setBackground(new Color(0, 0, 51));
@@ -306,7 +322,7 @@ public class Editor {
 		repeatButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
-					String repeatBtn = JOptionPane.showInputDialog(Editor, "Index of the button that"
+					String repeatBtn = JOptionPane.showInputDialog(editor, "Index of the button that"
 							+ " will handle repeat functionality:");
 					appendToFile("/~repeat-button:"+repeatBtn+"\n");
 				} else {
@@ -314,13 +330,13 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(repeatButton);
+		editor.getContentPane().add(repeatButton);
 
 		JButton skipLine = new JButton("Add target line for skip functionality");
 		skipLine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(isScenario()) {
-					String skipTarget = JOptionPane.showInputDialog(Editor, "Target line identifier:");
+					String skipTarget = JOptionPane.showInputDialog(editor, "Target line identifier:");
 					appendToFile("/~"+skipTarget+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
@@ -329,13 +345,13 @@ public class Editor {
 		});
 		skipLine.setBackground(new Color(0, 0, 51));
 		skipLine.setForeground(Color.WHITE);
-		Editor.getContentPane().add(skipLine);
+		editor.getContentPane().add(skipLine);
 
 		JButton skipToTarget = new JButton("Skip to target line in file");
 		skipToTarget.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(isScenario()) {
-					String targetLine = JOptionPane.showInputDialog(Editor, "Target line identifier:");
+					String targetLine = JOptionPane.showInputDialog(editor, "Target line identifier:");
 					appendToFile("/~skip:"+targetLine+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
@@ -344,7 +360,7 @@ public class Editor {
 		});
 		skipToTarget.setBackground(new Color(0, 0, 51));
 		skipToTarget.setForeground(Color.WHITE);
-		Editor.getContentPane().add(skipToTarget);
+		editor.getContentPane().add(skipToTarget);
 
 		JButton skipButton = new JButton("Assign button to skip to line");
 		skipButton.addActionListener(new ActionListener() {
@@ -367,7 +383,7 @@ public class Editor {
 		});
 		skipButton.setBackground(new Color(0, 0, 51));
 		skipButton.setForeground(Color.WHITE);
-		Editor.getContentPane().add(skipButton);
+		editor.getContentPane().add(skipButton);
 
 		JButton getInput = new JButton("Request user input(button press)");
 		getInput.addActionListener(new ActionListener() {
@@ -381,7 +397,7 @@ public class Editor {
 		});
 		getInput.setBackground(new Color(0, 0, 51));
 		getInput.setForeground(Color.WHITE);
-		Editor.getContentPane().add(getInput);
+		editor.getContentPane().add(getInput);
 
 		JButton resetBtns = new JButton("Reset all the buttons");
 		resetBtns.addActionListener(new ActionListener() {
@@ -395,14 +411,14 @@ public class Editor {
 		});
 		resetBtns.setBackground(new Color(0, 0, 51));
 		resetBtns.setForeground(Color.WHITE);
-		Editor.getContentPane().add(resetBtns);
+		editor.getContentPane().add(resetBtns);
 
 		JButton saveAndExit = new JButton("Save and Exit");
 		saveAndExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(isScenario()) {
 					int returnCode = ifTerminate();
-					if(returnCode==0 || returnCode==2) Editor.dispose();
+					if(returnCode==0 || returnCode==2) editor.dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
@@ -421,7 +437,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(clrCells);
+		editor.getContentPane().add(clrCells);
 
 		JButton clrACell = new JButton("Clear a single braille cell using ID");
 		clrACell.setBackground(new Color(0, 0, 51));
@@ -429,14 +445,14 @@ public class Editor {
 		clrACell.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(isScenario()) {
-					String clearID = JOptionPane.showInputDialog(Editor, "Clear braille cell with ID:");
+					String clearID = JOptionPane.showInputDialog(editor, "Clear braille cell with ID:");
 					appendToFile("/~disp-clear-cell:"+clearID+"\n");
 				} else {
 					JOptionPane.showMessageDialog(null, "No scenario file");
 				}
 			}
 		});
-		Editor.getContentPane().add(clrACell);
+		editor.getContentPane().add(clrACell);
 
 		JButton setACell = new JButton("Set braille cell state");
 		setACell.setBackground(new Color(0, 0, 51));
@@ -459,7 +475,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(setACell);
+		editor.getContentPane().add(setACell);
 
 		JButton dispChar = new JButton("Set braille cell to display a character");
 		dispChar.setBackground(new Color(0, 0, 51));
@@ -482,7 +498,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(dispChar);
+		editor.getContentPane().add(dispChar);
 
 		JButton raisePin = new JButton("Raise a single pin of single braille cell");
 		raisePin.setBackground(new Color(0, 0, 51));
@@ -505,7 +521,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(raisePin);
+		editor.getContentPane().add(raisePin);
 
 		JButton lowerPin = new JButton("Lower a single pin of single cell");
 		lowerPin.setBackground(new Color(0, 0, 51));
@@ -528,7 +544,7 @@ public class Editor {
 				}
 			}
 		});
-		Editor.getContentPane().add(lowerPin);
+		editor.getContentPane().add(lowerPin);
 
 		JButton saveFile = new JButton("Save and close file");
 		saveFile.addActionListener(new ActionListener() {
@@ -545,10 +561,10 @@ public class Editor {
 		});
 		saveFile.setBackground(new Color(0, 102, 51));
 		saveFile.setForeground(Color.WHITE);
-		Editor.getContentPane().add(saveFile);
+		editor.getContentPane().add(saveFile);
 		saveAndExit.setBackground(new Color(0, 102, 51));
 		saveAndExit.setForeground(Color.WHITE);
-		Editor.getContentPane().add(saveAndExit);
+		editor.getContentPane().add(saveAndExit);
 	}
 	/**
 	 * Checks to see if there is scenario file opened and ready to be edited
@@ -584,7 +600,7 @@ public class Editor {
 	 */
 	public String browseFile() {
 		JFileChooser browseFile = new JFileChooser();
-		browseFile.showOpenDialog(Editor);
+		browseFile.showOpenDialog(editor);
 		try {
 			return browseFile.getSelectedFile().getPath();
 		} catch(NullPointerException e) {
