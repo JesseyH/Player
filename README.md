@@ -1,6 +1,9 @@
 # The Authoring App
 The Authoring App created in java allows educator to create and customize scenario file as they see fit using easy and simple GUI consisting of various button to add instruction which can be read by Player app.
 
+#Class Diagram
+![Authoring App Image](https://raw.githubusercontent.com/JesseyH/Player/AuthoringApp/ClassDiagram.png)
+
 # Demo
 ![Authoring App Image](https://raw.githubusercontent.com/JesseyH/Player/AuthoringApp/demo.png)
 
