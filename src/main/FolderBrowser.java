@@ -3,6 +3,7 @@ package main;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import main.core.FolderBrowserListener;
 
 /**
  * Opens a Java FolderBrowser upon instantiation.
@@ -13,20 +14,18 @@ public class FolderBrowser {
 
 	/**
 	 * Constructor for the FolderBrowser.
+	 * @param parentFrame The parent JFrame in which the JFileChooser will be attached to.
 	 * @param listener The FolderBrowserListener
 	 * @param load If this boolean is set to true, then we are loading a scenario file
 	 * and thus we should allow only txt files to be selected. If this boolean is set to false
 	 * then we are creating a scenario file and thus must only allow directories to be selected and no files.
 	 */
-	public FolderBrowser(FolderBrowserListener listener, boolean load) {
-		
-		//Get the parent JFrame instance (the editor gui)
-		JFrame parent = Editor.getEditor();
+	public FolderBrowser(JFrame parentFrame, FolderBrowserListener listener, boolean load) {
 		
 		//Instantiate the JavaFileChooser with title and initial directory.
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new java.io.File("."));
-		chooser.setDialogTitle(load ? "Open Your Scenario File (Must Be txt file)" : "Choose a Directory to Save Scenario File into");
+		chooser.setDialogTitle(load ? "Open Your Scenario File (Must Be txt file)" : "Choose a Directory to Save Scenario File Into");
 		
 		//Disable ability to select all file types.
 		chooser.setAcceptAllFileFilterUsed(false);
@@ -46,7 +45,7 @@ public class FolderBrowser {
 		
 		// Open the file chooser and if they have pressed okay, called the listener's
 		// on success method and pass the file/folder that was selected.
-		if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
+		if (chooser.showOpenDialog(parentFrame) == JFileChooser.APPROVE_OPTION) {
 			listener.onSuccess(chooser.getCurrentDirectory());
 		} else { // If file/folder selection failed, call the listeners on fail method.
 			listener.onFail();

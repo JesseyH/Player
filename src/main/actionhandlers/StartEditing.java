@@ -2,16 +2,10 @@ package main.actionhandlers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
-import javax.swing.JFrame;
-
-import main.FolderBrowser;
 import main.core.EditorViewController;
-import main.core.FolderBrowserListener;
 
-
-public class EditExisting implements ActionListener, FolderBrowserListener {
+public class StartEditing implements ActionListener {
 
 	private EditorViewController view;
 	
@@ -21,24 +15,19 @@ public class EditExisting implements ActionListener, FolderBrowserListener {
 	 * so that the editor view can be controlled through this class.
 	 * @param view The EditorView instance.
 	 */
-	public EditExisting(EditorViewController view) {
+	public StartEditing(EditorViewController view) {
 		this.view = view;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		FolderBrowser folderBrowser = new FolderBrowser((JFrame) view, this, true);
-	}
-
-	@Override
-	public void onSuccess(File file) {
-		System.out.println("CB: " + file);
-		view.switchToEditorScreen();
-	}
-
-	@Override
-	public void onFail() {
-				
+		if(view.getScenarioFileName().length() == 0) {
+			view.showErrorMessage("Please enter the name of the new scenario file!");
+		} else if (view.getScenarioFileDir().equals("No Directory Selected...") || view.getScenarioFileDir().equals("")) {
+			view.showErrorMessage("Please select a directory to save the scenario file to!");
+		} else {
+			view.switchToEditorScreen();
+		}
 	}
 
 }
