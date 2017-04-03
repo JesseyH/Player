@@ -27,13 +27,13 @@ import javax.swing.BoxLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javax.swing.SpringLayout;
 
 public class EditorView extends JFrame implements EditorViewController {
 
 	private JPanel contentPane;
 	private JTextField scenarioFileName;
 	private JTextField selectedDirectoryText;
-	private JTextField txtFuckYea;
 
 	/**
 	 * Launch the application.
@@ -146,11 +146,17 @@ public class EditorView extends JFrame implements EditorViewController {
 		
 		JPanel editorPanel = new JPanel();
 		contentPane.add(editorPanel, "editorPanel");
+		SpringLayout sl_editorPanel = new SpringLayout();
+		editorPanel.setLayout(sl_editorPanel);
 		
-		txtFuckYea = new JTextField();
-		txtFuckYea.setText("fuck yea");
-		editorPanel.add(txtFuckYea);
-		txtFuckYea.setColumns(10);
+		JButton btnAddBlock = new JButton("Add Question");
+		btnAddBlock.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		sl_editorPanel.putConstraint(SpringLayout.NORTH, btnAddBlock, 10, SpringLayout.NORTH, editorPanel);
+		sl_editorPanel.putConstraint(SpringLayout.WEST, btnAddBlock, 10, SpringLayout.WEST, editorPanel);
+		editorPanel.add(btnAddBlock);
 		
 	}
 
@@ -195,7 +201,4 @@ public class EditorView extends JFrame implements EditorViewController {
 		JOptionPane.showMessageDialog(null, errorMessage, "Error",
                 JOptionPane.ERROR_MESSAGE);		
 	}
-
-	
-
 }
