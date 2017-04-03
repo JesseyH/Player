@@ -24,6 +24,7 @@ import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import java.awt.Dimension;
+import javax.swing.JScrollPane;
 
 public class BlockBuilder extends JPanel {
 	private JTextField textField;
@@ -105,20 +106,21 @@ public class BlockBuilder extends JPanel {
 		panel_2.add(panel_5, gbc_panel_5);
 		GridBagLayout gbl_panel_5 = new GridBagLayout();
 		gbl_panel_5.columnWidths = new int[]{0, 0};
-		gbl_panel_5.rowHeights = new int[]{0, 0, 0};
+		gbl_panel_5.rowHeights = new int[]{0, 0};
 		gbl_panel_5.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panel_5.rowWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gbl_panel_5.rowWeights = new double[]{1.0, Double.MIN_VALUE};
 		panel_5.setLayout(gbl_panel_5);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		GridBagConstraints gbc_textArea = new GridBagConstraints();
-		gbc_textArea.fill = GridBagConstraints.BOTH;
-		gbc_textArea.gridheight = 2;
-		gbc_textArea.insets = new Insets(0, 0, 5, 0);
-		gbc_textArea.gridx = 0;
-		gbc_textArea.gridy = 0;
-		panel_5.add(textArea, gbc_textArea);
+		JScrollPane scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 0;
+		panel_5.add(scrollPane, gbc_scrollPane);
+		
+		JTextArea txtrloremIpsumDolor = new JTextArea();
+		scrollPane.setViewportView(txtrloremIpsumDolor);
+		txtrloremIpsumDolor.setEditable(false);
 		
 		JPanel panel_4 = new JPanel();
 		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
