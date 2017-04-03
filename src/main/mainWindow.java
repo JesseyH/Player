@@ -16,7 +16,7 @@ public class mainWindow extends JPanel {
 		SpringLayout springLayout = new SpringLayout();
 		setLayout(springLayout);
 		JPanel scrollalePanel = new JPanel();
-		scrollalePanel.setPreferredSize(new Dimension(140,2000));
+		scrollalePanel.setPreferredSize(new Dimension(300,2000));
 		JScrollPane scrollFrame = new JScrollPane(scrollalePanel);
 		scrollalePanel.setAutoscrolls(true);
 		scrollFrame.setPreferredSize(new Dimension(155,450));
@@ -56,7 +56,7 @@ public class mainWindow extends JPanel {
 		springLayout.putConstraint(SpringLayout.EAST, scrollable, -10, SpringLayout.EAST, this);
 		textArea.setLineWrap(true);  
 		textArea.setWrapStyleWord(true); 
-		scrollable.setPreferredSize(new Dimension(200, 200));
+		scrollable.setPreferredSize(new Dimension(300, 200));
 		add(scrollable);
 		
 		JLabel lblFile = new JLabel("FILE");

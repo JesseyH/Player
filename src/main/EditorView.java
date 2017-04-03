@@ -34,6 +34,8 @@ public class EditorView extends JFrame implements EditorViewController {
 	private JPanel contentPane;
 	private JTextField scenarioFileName;
 	private JTextField selectedDirectoryText;
+	private JTextField brailleCellsText;
+	private JTextField buttonsText;
 
 	/**
 	 * Launch the application.
@@ -59,7 +61,7 @@ public class EditorView extends JFrame implements EditorViewController {
 		setTitle("Group 6 Authoring App");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(EditorView.class.getResource("/main/icon.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 654, 209);
+		setBounds(100, 100, 655, 231);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -69,9 +71,9 @@ public class EditorView extends JFrame implements EditorViewController {
 		contentPane.add(initialPanel, "initialPanel");
 		GridBagLayout gbl_initialPanel = new GridBagLayout();
 		gbl_initialPanel.columnWidths = new int[]{0, 0, 0};
-		gbl_initialPanel.rowHeights = new int[] {30, 30, 30, 30, 30, 30};
+		gbl_initialPanel.rowHeights = new int[] {30, 30, 30, 30, 30, 0, 30};
 		gbl_initialPanel.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_initialPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_initialPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		initialPanel.setLayout(gbl_initialPanel);
 		
 		JLabel scenarioFileNameLabel = new JLabel("1) Name of the new scenario file (exclude file extension):");
@@ -97,7 +99,7 @@ public class EditorView extends JFrame implements EditorViewController {
 		JLabel selectDirectoryLabel = new JLabel("2) Select the directory to save the scenario file to:");
 		selectDirectoryLabel.setFont(new Font("Tahoma", Font.PLAIN, 18));
 		GridBagConstraints gbc_selectDirectoryLabel = new GridBagConstraints();
-		gbc_selectDirectoryLabel.anchor = GridBagConstraints.EAST;
+		gbc_selectDirectoryLabel.anchor = GridBagConstraints.WEST;
 		gbc_selectDirectoryLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_selectDirectoryLabel.gridx = 0;
 		gbc_selectDirectoryLabel.gridy = 1;
@@ -136,27 +138,51 @@ public class EditorView extends JFrame implements EditorViewController {
 		JButton btnStart = new JButton("Start Editing");
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 20));
 		btnStart.addActionListener(new StartEditing(this));
+		
+		JLabel lblEnterNumber = new JLabel("3) Enter number of braille cells:");
+		lblEnterNumber.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		GridBagConstraints gbc_lblEnterNumber = new GridBagConstraints();
+		gbc_lblEnterNumber.anchor = GridBagConstraints.WEST;
+		gbc_lblEnterNumber.insets = new Insets(0, 0, 5, 5);
+		gbc_lblEnterNumber.gridx = 0;
+		gbc_lblEnterNumber.gridy = 3;
+		initialPanel.add(lblEnterNumber, gbc_lblEnterNumber);
+		
+		brailleCellsText = new JTextField();
+		GridBagConstraints gbc_brailleCellsText = new GridBagConstraints();
+		gbc_brailleCellsText.insets = new Insets(0, 0, 5, 0);
+		gbc_brailleCellsText.fill = GridBagConstraints.HORIZONTAL;
+		gbc_brailleCellsText.gridx = 1;
+		gbc_brailleCellsText.gridy = 3;
+		initialPanel.add(brailleCellsText, gbc_brailleCellsText);
+		brailleCellsText.setColumns(10);
+		
+		JLabel lblEnterNumber_1 = new JLabel("4) Enter number of buttons:");
+		lblEnterNumber_1.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		GridBagConstraints gbc_lblEnterNumber_1 = new GridBagConstraints();
+		gbc_lblEnterNumber_1.anchor = GridBagConstraints.WEST;
+		gbc_lblEnterNumber_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblEnterNumber_1.gridx = 0;
+		gbc_lblEnterNumber_1.gridy = 4;
+		initialPanel.add(lblEnterNumber_1, gbc_lblEnterNumber_1);
+		
+		buttonsText = new JTextField();
+		GridBagConstraints gbc_buttonsText = new GridBagConstraints();
+		gbc_buttonsText.insets = new Insets(0, 0, 5, 0);
+		gbc_buttonsText.fill = GridBagConstraints.HORIZONTAL;
+		gbc_buttonsText.gridx = 1;
+		gbc_buttonsText.gridy = 4;
+		initialPanel.add(buttonsText, gbc_buttonsText);
+		buttonsText.setColumns(10);
 		GridBagConstraints gbc_btnStart = new GridBagConstraints();
 		gbc_btnStart.fill = GridBagConstraints.BOTH;
 		gbc_btnStart.gridwidth = 2;
-		gbc_btnStart.insets = new Insets(0, 0, 0, 5);
 		gbc_btnStart.gridx = 0;
-		gbc_btnStart.gridy = 4;
+		gbc_btnStart.gridy = 5;
 		initialPanel.add(btnStart, gbc_btnStart);
 		
-		JPanel editorPanel = new JPanel();
+		JPanel editorPanel = new EditorPanel();
 		contentPane.add(editorPanel, "editorPanel");
-		SpringLayout sl_editorPanel = new SpringLayout();
-		editorPanel.setLayout(sl_editorPanel);
-		
-		JButton btnAddBlock = new JButton("Add Question");
-		btnAddBlock.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		sl_editorPanel.putConstraint(SpringLayout.NORTH, btnAddBlock, 10, SpringLayout.NORTH, editorPanel);
-		sl_editorPanel.putConstraint(SpringLayout.WEST, btnAddBlock, 10, SpringLayout.WEST, editorPanel);
-		editorPanel.add(btnAddBlock);
 		
 	}
 
@@ -170,6 +196,7 @@ public class EditorView extends JFrame implements EditorViewController {
 	
 	@Override
 	public void switchToEditorScreen() {
+		setSize(1000, 500);
 		CardLayout cardLayout = (CardLayout) contentPane.getLayout();
 		cardLayout.show(contentPane, "editorPanel");
 	}
@@ -200,5 +227,15 @@ public class EditorView extends JFrame implements EditorViewController {
 	public void showErrorMessage(String errorMessage) {
 		JOptionPane.showMessageDialog(null, errorMessage, "Error",
                 JOptionPane.ERROR_MESSAGE);		
+	}
+
+	@Override
+	public String getBrailleCells() {
+		return brailleCellsText.getText();
+	}
+
+	@Override
+	public String getButtons() {
+		return buttonsText.getText();
 	}
 }

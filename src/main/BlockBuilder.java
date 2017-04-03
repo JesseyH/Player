@@ -13,6 +13,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.border.TitledBorder;
+
+import main.core.Scenario;
+
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -23,26 +26,31 @@ import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+
 import java.awt.Dimension;
 import javax.swing.JScrollPane;
+import javax.swing.JCheckBox;
+import java.awt.Toolkit;
 
-public class BlockBuilder extends JPanel {
+public class BlockBuilder extends JDialog {
 	private JTextField textField;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextField textField_1;
-	private JTextField textField_2;
 	private JTextField textField_3;
 
 	/**
 	 * Create the panel.
 	 */
 	public BlockBuilder() {
+		setTitle("Scenario Section Block Builder");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(BlockBuilder.class.getResource("/main/icon.png")));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{450, 0};
 		gridBagLayout.rowHeights = new int[]{43, 0, 0, 0, 0, 0, 0};
 		gridBagLayout.columnWeights = new double[]{1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-		setLayout(gridBagLayout);
+		getContentPane().setLayout(gridBagLayout);
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Header", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -51,7 +59,7 @@ public class BlockBuilder extends JPanel {
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 0;
-		add(panel, gbc_panel);
+		getContentPane().add(panel, gbc_panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 0};
 		gbl_panel.rowHeights = new int[]{0, 0};
@@ -74,7 +82,7 @@ public class BlockBuilder extends JPanel {
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 0;
 		gbc_panel_1.gridy = 1;
-		add(panel_1, gbc_panel_1);
+		getContentPane().add(panel_1, gbc_panel_1);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{0, 0};
 		gbl_panel_1.rowHeights = new int[]{0, 0, 0};
@@ -129,6 +137,16 @@ public class BlockBuilder extends JPanel {
 		gbc_panel_4.gridy = 1;
 		panel_2.add(panel_4, gbc_panel_4);
 		
+		JButton btnWriteToBrai = new JButton("Write to braille cell");
+		btnWriteToBrai.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JDialog dialog = new WriteToBraille();
+				dialog.setAlwaysOnTop(true);
+				dialog.setVisible(true);
+			}
+		});
+		panel_4.add(btnWriteToBrai);
+		
 		JButton btnNewButton = new JButton("Add TTS");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -140,10 +158,20 @@ public class BlockBuilder extends JPanel {
 		panel_4.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Record Sound");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JDialog soundRecorder = new SoundRecorder();
+				soundRecorder.setAlwaysOnTop(true);
+				soundRecorder.setVisible(true);
+			}
+		});
 		panel_4.add(btnNewButton_2);
 		
+		JCheckBox chckbxIsRepeatable = new JCheckBox("is repeatable");
+		panel_4.add(chckbxIsRepeatable);
+		
 		JPanel panel_11 = new JPanel();
-		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Add jump locations", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Manage Flow", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		GridBagConstraints gbc_panel_11 = new GridBagConstraints();
 		gbc_panel_11.fill = GridBagConstraints.BOTH;
 		gbc_panel_11.gridx = 0;
@@ -174,7 +202,7 @@ public class BlockBuilder extends JPanel {
 		gbl_panel_7.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		panel_7.setLayout(gbl_panel_7);
 		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("New radio button");
+		JRadioButton rdbtnNewRadioButton = new JRadioButton("Wait For User Input");
 		buttonGroup.add(rdbtnNewRadioButton);
 		GridBagConstraints gbc_rdbtnNewRadioButton = new GridBagConstraints();
 		gbc_rdbtnNewRadioButton.insets = new Insets(0, 0, 5, 0);
@@ -183,13 +211,16 @@ public class BlockBuilder extends JPanel {
 		gbc_rdbtnNewRadioButton.gridy = 0;
 		panel_7.add(rdbtnNewRadioButton, gbc_rdbtnNewRadioButton);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		GridBagConstraints gbc_comboBox_1 = new GridBagConstraints();
-		gbc_comboBox_1.insets = new Insets(0, 0, 0, 5);
-		gbc_comboBox_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox_1.gridx = 0;
-		gbc_comboBox_1.gridy = 1;
-		panel_7.add(comboBox_1, gbc_comboBox_1);
+		JComboBox<Integer> buttonsDropdown = new JComboBox<>();
+		for(int i = 0; i < Scenario.getButtons(); i ++) {
+			buttonsDropdown.addItem(i);
+		}
+		GridBagConstraints gbc_buttonsDropdown = new GridBagConstraints();
+		gbc_buttonsDropdown.insets = new Insets(0, 0, 0, 5);
+		gbc_buttonsDropdown.fill = GridBagConstraints.HORIZONTAL;
+		gbc_buttonsDropdown.gridx = 0;
+		gbc_buttonsDropdown.gridy = 1;
+		panel_7.add(buttonsDropdown, gbc_buttonsDropdown);
 		
 		textField_3 = new JTextField();
 		GridBagConstraints gbc_textField_3 = new GridBagConstraints();
@@ -200,7 +231,11 @@ public class BlockBuilder extends JPanel {
 		panel_7.add(textField_3, gbc_textField_3);
 		textField_3.setColumns(10);
 		
-		JButton btnNewButton_3 = new JButton("add jump");
+		JButton btnNewButton_3 = new JButton("Save Button Action");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
 		gbc_btnNewButton_3.gridx = 2;
 		gbc_btnNewButton_3.gridy = 1;
@@ -210,53 +245,22 @@ public class BlockBuilder extends JPanel {
 		panel_6.setBorder(UIManager.getBorder("RadioButton.border"));
 		panel_3.add(panel_6);
 		
-		JRadioButton rdbtnSkiplocation = new JRadioButton("skip-location");
+		JRadioButton rdbtnSkiplocation = new JRadioButton("Continue To Section");
+		rdbtnSkiplocation.setSelected(true);
 		panel_6.add(rdbtnSkiplocation);
 		buttonGroup.add(rdbtnSkiplocation);
-		
+
 		textField_1 = new JTextField();
 		textField_1.setHorizontalAlignment(SwingConstants.CENTER);
 		panel_6.add(textField_1);
 		textField_1.setColumns(10);
 		
-		JPanel panel_10 = new JPanel();
-		panel_10.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Braille Cell Editor", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		GridBagConstraints gbc_panel_10 = new GridBagConstraints();
-		gbc_panel_10.fill = GridBagConstraints.BOTH;
-		gbc_panel_10.insets = new Insets(0, 0, 5, 0);
-		gbc_panel_10.gridx = 0;
-		gbc_panel_10.gridy = 4;
-		add(panel_10, gbc_panel_10);
-		GridBagLayout gbl_panel_10 = new GridBagLayout();
-		gbl_panel_10.columnWidths = new int[]{450, 0};
-		gbl_panel_10.rowHeights = new int[]{0, 0};
-		gbl_panel_10.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panel_10.rowWeights = new double[]{1.0, Double.MIN_VALUE};
-		panel_10.setLayout(gbl_panel_10);
-		
-		JPanel panel_8 = new JPanel();
-		GridBagConstraints gbc_panel_8 = new GridBagConstraints();
-		gbc_panel_8.fill = GridBagConstraints.BOTH;
-		gbc_panel_8.gridx = 0;
-		gbc_panel_8.gridy = 0;
-		panel_10.add(panel_8, gbc_panel_8);
-		
-		JComboBox comboBox = new JComboBox();
-		panel_8.add(comboBox);
-		
-		textField_2 = new JTextField();
-		panel_8.add(textField_2);
-		textField_2.setColumns(10);
-		
-		JButton btnEditCell = new JButton("edit cell");
-		panel_8.add(btnEditCell);
-		
 		JPanel panel_9 = new JPanel();
 		GridBagConstraints gbc_panel_9 = new GridBagConstraints();
 		gbc_panel_9.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panel_9.gridx = 0;
-		gbc_panel_9.gridy = 5;
-		add(panel_9, gbc_panel_9);
+		gbc_panel_9.gridy = 4;
+		getContentPane().add(panel_9, gbc_panel_9);
 		
 		JButton btnFinish = new JButton("Finish Block");
 		panel_9.add(btnFinish);

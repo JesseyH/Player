@@ -32,6 +32,10 @@ public interface EditorViewController {
 	 */
 	public String getScenarioFileDir();
 	
+	public String getBrailleCells();
+	
+	public String getButtons();
+	
 	/**
 	 * Called when an popup containing an error message should be displayed.
 	 * @param errorMessage The error message to display

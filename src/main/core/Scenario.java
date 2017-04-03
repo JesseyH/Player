@@ -1,41 +1,65 @@
 package main.core;
 
-import java.io.File;
+import java.util.ArrayList;
 
 public class Scenario {
 	
-	//Static variable to hold the singleton instance of the scenario file currently being worked on.
-	private static Scenario scenarioFile;
+	private static String fileName;
+	private static String directory;
+	private static int brailleCells;
+	private static int buttons;
+	
+	private static ArrayList<String> scenarioBuffer;
+	private static ArrayList<String> blockTextBuffer;
+	private static ArrayList<String> blockButtonBuffer; 
 	
 	/**
-	 * Getter method for the scenario singleton instance.
-	 * @return The scenario instance being used.
+	 * Initializes the Scenario by providing the name of the Scenario file
+	 * as well as the directory where the scenario file will be saved to.
+	 * @param filename The name of the scenario file.
+	 * @param dir The directory where the scenario file and all supporting 
+	 * files (i.e. audio files) will be saved.
 	 */
-	public static Scenario get() {
-		if(scenarioFile == null) {
-			try {
-				throw new Exception("Scenario file was not loaded or created!");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return scenarioFile;
+	public static void initialize(String filename, String dir, int braillecells, int butt) {
+		fileName = filename;
+		directory = dir;
+		brailleCells = braillecells;
+		buttons = butt;
+		scenarioBuffer = new ArrayList<>();
+		blockTextBuffer = new ArrayList<>();
+		blockButtonBuffer = new ArrayList<>();
 	}
-
+	
 	/**
-	 * Loads an existing scenario file or creates a new scenario file.
-	 * @param load True if we're loading an existing scenario file or false to create a new one.
-	 * @param file If creating a new scenario file, this should be the name of the scenario file.
-	 * If loading a scenario file, this should be the path to the scenario file to load.
-	 * @return The Scenario instance instantiated after loading or creating the scenario file.
+	 * Returns the fileName currently in use.
+	 * @return The fileName
 	 */
-	public static Scenario loadOrCreate(boolean load, File file) {
-		if(load) {
-			
-		} else {
-			
-		}
-		return scenarioFile;
+	public static String getFileName() {
+		return fileName;
 	}
+	
+	public static String getDirectory() {
+		return directory;
+	}
+	
+	public static int getBrailleCells() {
+		return brailleCells;
+	}
+	
+	public static int getButtons() {
+		return buttons;
+	}
+	
+	public static ArrayList<String> getScenarioBuffer() {
+		return scenarioBuffer;
+	}
+	
+	public static ArrayList<String> getBlockTextBuffer() {
+		return blockTextBuffer;
+	}
+	
+	public static ArrayList<String> getBlockButtonBuffer() {
+		return blockButtonBuffer;
+	}	
 
 }
