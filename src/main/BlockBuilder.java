@@ -32,13 +32,14 @@ import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JCheckBox;
 import java.awt.Toolkit;
+import javax.swing.DefaultComboBoxModel;
 
 public class BlockBuilder extends JDialog {
 	private JTextField textField;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JTextField textField_1;
 	private JTextField textField_3;
-
+	private String bufferText;
 	/**
 	 * Create the panel.
 	 */
@@ -126,9 +127,9 @@ public class BlockBuilder extends JDialog {
 		gbc_scrollPane.gridy = 0;
 		panel_5.add(scrollPane, gbc_scrollPane);
 		
-		JTextArea txtrloremIpsumDolor = new JTextArea();
-		scrollPane.setViewportView(txtrloremIpsumDolor);
-		txtrloremIpsumDolor.setEditable(false);
+		JTextArea buffer = new JTextArea();
+		scrollPane.setViewportView(buffer);
+		buffer.setEditable(false);
 		
 		JPanel panel_4 = new JPanel();
 		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
@@ -145,11 +146,21 @@ public class BlockBuilder extends JDialog {
 				dialog.setVisible(true);
 			}
 		});
+		
+		JLabel lblChooseVoice = new JLabel("Choose Voice");
+		panel_4.add(lblChooseVoice);
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"male 1", "female", "male 2", "male 3"}));
+		panel_4.add(comboBox);
 		panel_4.add(btnWriteToBrai);
 		
 		JButton btnNewButton = new JButton("Add TTS");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				JDialog dialog = new WriteTTS();
+				dialog.setAlwaysOnTop(true);
+				dialog.setVisible(true);
 			}
 		});
 		panel_4.add(btnNewButton);
@@ -169,6 +180,19 @@ public class BlockBuilder extends JDialog {
 		
 		JCheckBox chckbxIsRepeatable = new JCheckBox("is repeatable");
 		panel_4.add(chckbxIsRepeatable);
+		
+		JButton btnRefresh = new JButton("refresh");
+		btnRefresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				buffer.setText("");
+				bufferText = "";
+				for (int i = 0; i < Scenario.getBlockTextBuffer().size(); i++) {
+					bufferText = bufferText + Scenario.getBlockTextBuffer().get(i) + "\n";
+				}
+				buffer.setText(bufferText);
+			}
+		});
+		panel_4.add(btnRefresh);
 		
 		JPanel panel_11 = new JPanel();
 		panel_11.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Manage Flow", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -264,6 +288,14 @@ public class BlockBuilder extends JDialog {
 		
 		JButton btnFinish = new JButton("Finish Block");
 		panel_9.add(btnFinish);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		panel_9.add(btnCancel);
 
 	}
 }

@@ -90,7 +90,7 @@ public class WriteTTS extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 							Scenario.getBlockTextBuffer().add(text.getText());
-						
+							dispose();
 					}
 				});
 				okButton.setActionCommand("OK");
