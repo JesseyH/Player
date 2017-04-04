@@ -96,6 +96,7 @@ public class WriteToBraille extends JDialog {
 					                JOptionPane.ERROR_MESSAGE);
 						} else {
 							Scenario.getBlockTextBuffer().add("/~disp-string:" + brailleText.getText());
+							dispose();
 						}
 					}
 				});
