@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 
 import main.core.EditorPanelController;
 import main.core.Scenario;
@@ -33,7 +34,16 @@ import java.awt.Color;
 public class EditorPanel extends JPanel implements EditorPanelController {
 	
 	private JTextArea scenarioBufferText;
-	private JTable table;
+	private JTable toDoList;
+	//Contains the missing Sections that show up in the to do list
+		private DefaultTableModel table = new DefaultTableModel
+				(
+				new Object[][] {
+					
+				},
+				new String[] {
+					"Missing Sections"
+				});
 
 	/**
 	 * Create the panel.
@@ -68,8 +78,9 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 		gbc_scrollPane.gridy = 0;
 		panel.add(scrollPane, gbc_scrollPane);
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
+		toDoList = new JTable();
+		toDoList.setModel(table);
+		scrollPane.setViewportView(toDoList);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Scenario File", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -146,6 +157,24 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 			temp += s + "\n";
 		}
 		scenarioBufferText.setText(temp);
+		
+		buffer = Scenario.getBlockButtonBuffer();
+		
+		for (String s: buffer) {
+			if ((s.length() != 0) && !(s.equals("/~repeat-button:0"))  && !Scenario.isInMissing(s)) {
+				Scenario.getMissingSections().add(new String[] { s });
+			}
+		}
+		
+		while (table.getRowCount() != 0) {
+			table.removeRow(0);
+		}
+		
+		for (String[] s: Scenario.getMissingSections()) {
+			table.addRow(s);
+		}
+		
+		toDoList.setModel(table);
 	}
 
 }

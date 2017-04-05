@@ -34,6 +34,7 @@ public class Scenario {
 	private static ArrayList<String> scenarioBuffer;
 	private static ArrayList<String> blockTextBuffer;
 	private static ArrayList<String> blockButtonBuffer; 
+	private static ArrayList<String[]> missingSections;
 	
 	/**
 	 * Initializes the Scenario by providing the name of the Scenario file,
@@ -53,6 +54,7 @@ public class Scenario {
 		scenarioBuffer = new ArrayList<>();
 		blockTextBuffer = new ArrayList<>();
 		blockButtonBuffer = new ArrayList<>();
+		missingSections = new ArrayList<>();
 		createScenarioDirectory();
 	}
 	
@@ -380,6 +382,24 @@ public class Scenario {
 	public static ArrayList<String> getBlockButtonBuffer() {
 		return blockButtonBuffer;
 	}	
+	
+	/**
+	 * Returns the missing Sections list
+	 * @return the missing Sections arraylist
+	 */
+	public static ArrayList<String[]> getMissingSections() {
+		return missingSections;
+	}
+	
+	public static boolean isInMissing(String s) {
+		boolean isMissing = false;
+		for (String[] missing : missingSections) {
+			if (s.equals(missing[0])) {
+				isMissing = true;
+			}
+		}
+		return isMissing;
+	}
 
 }
  
