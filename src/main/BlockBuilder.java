@@ -45,6 +45,7 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 	private JCheckBox chckbxIsRepeatable;
 	private JRadioButton skipToSection;
 	private JRadioButton waitForInput;
+	private JComboBox<String> voice;
 	private JComboBox<Integer> buttonsDropdown;
 	private JTextField skipToSectionName;
 	private JTextField buttonAction;
@@ -163,9 +164,9 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 		JLabel lblChooseVoice = new JLabel("Choose Voice");
 		panel_4.add(lblChooseVoice);
 		
-		JComboBox<String> comboBox = new JComboBox<>();
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"male 1", "female", "male 2", "male 3"}));
-		panel_4.add(comboBox);
+		voice = new JComboBox<>();
+		voice.setModel(new DefaultComboBoxModel<String>(new String[] {"male 1", "female", "male 2", "male 3"}));
+		panel_4.add(voice);
 		panel_4.add(btnWriteToBrai);
 		
 		JButton btnNewButton = new JButton("Add Text To Be Spoken");
@@ -407,28 +408,35 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 					showError("You have selected that you would like to continue to another section after completion of this section."
 							+ "\nPlease enter the name of the section that you would like to continue to, even if the section does not yet exist!", "No Section To Continue To");
 				} else {
-					Scenario.bufferWriteSkip(skipToSectionName.getText());
-					Scenario.bufferWriteSectionHeader(sectionName.getText());
-					Scenario.copyBlockBuffersToScenarioBuffer();
+					Scenario.bufferWriteSkip(skipToSectionName.getText());		//First we write the command to skip to the end of the current buffer
+																			 	//Second we write the set voice command to the beginning of the current buffer
+					Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);	// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
+					Scenario.bufferWriteSectionHeader(sectionName.getText());	//Third we add the section header to the top of the current buffer
+					Scenario.copyBlockBuffersToScenarioBuffer();				//Finally we copy the current buffer to the scenario buffer.
 					editorPanel.refreshBuffer();
 					dispose();
 				}
 			//If wait for user input is selected
 			} else if (waitForInput.isSelected()) {
-				if(chckbxIsRepeatable.isSelected()) {
+				if(chckbxIsRepeatable.isSelected()) {	//If the option to repeat the current section is selected
 					if(Scenario.getBlockButtonBuffer().size() > 1) { //Make sure that atleast one other button other than the replay button has been set
-						Scenario.bufferWriteReplay(); //First write the replay commands
-						Scenario.bufferWriteSectionHeader(sectionName.getText());
-						Scenario.copyBlockBuffersToScenarioBuffer();
-						editorPanel.refreshBuffer();
+						
+						Scenario.bufferWriteReplay(); 								//First write the replay commands
+																					//Second we add the set voice command above the replay command
+						Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);		// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
+						Scenario.bufferWriteSectionHeader(sectionName.getText());	//Third, we add the section header to the top of the current buffer
+						Scenario.copyBlockBuffersToScenarioBuffer();				//Finally we copy the current buffer to the scenario buffer.
+						editorPanel.refreshBuffer();								
 						dispose();
 					} else {
-						showError("Because this secition is repeatable, you must assign atleast one button\n"
+						showError("Because this section is repeatable, you must assign atleast one button\n"
 								+ "to handle continuing if the user does not decide to replay.", "More Button Actions Required");
 					}
-				} else {
-					Scenario.bufferWriteSectionHeader(sectionName.getText());
-					Scenario.copyBlockBuffersToScenarioBuffer();
+				} else {	//If the option to repeat the current section is not selected
+																				//First we write the set voice command to the top of the current buffer.
+					Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);		// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
+					Scenario.bufferWriteSectionHeader(sectionName.getText());	// Second, we write the section header to the top of the current buffer
+					Scenario.copyBlockBuffersToScenarioBuffer();				// Finally we copy the current buffer to the scenario buffer.
 					editorPanel.refreshBuffer();
 					dispose();
 				}

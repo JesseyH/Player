@@ -107,15 +107,24 @@ public class Scenario {
 		return false;
 	}
 	
-	public static boolean bufferWriteSectionHeader(String header) {
+	/**
+	 * Writes the set voice command to the beginning of the buffer for the current section.
+	 * @param voice An integer between 1 and 4 inclusive that represents the available voices.
+	 * @return True if the voice was sucesfully set.
+	 */
+	public static boolean bufferWriteVoice(int voice) {
 		if(blockTextBuffer != null) {
-			ArrayList<String> newBuffer = new ArrayList<>();
-			newBuffer.add("/~" + header);
-			for(String s : blockTextBuffer) {
-				newBuffer.add(s);
+			if(voice >= 1 && voice <= 4) {	//Only set the voice if the voice is between 1 and 4 as these are the only voices that exist
+				ArrayList<String> newBuffer = new ArrayList<>();
+				newBuffer.add("/~set-voice:"+voice);
+				for(String s : blockTextBuffer) {
+					newBuffer.add(s);
+				}
+				blockTextBuffer = newBuffer;
+				return true;
+			} else {	//If a voice that doesn't exist is trying to be set, we will return false as this cannot happen.
+				return false;
 			}
-			blockTextBuffer = newBuffer;
-			return true;
 		}
 		return false;
 	}
@@ -128,6 +137,19 @@ public class Scenario {
 				newBuffer.add(s);
 			}
 			newBuffer.add("/~endrepeat");
+			blockTextBuffer = newBuffer;
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean bufferWriteSectionHeader(String header) {
+		if(blockTextBuffer != null) {
+			ArrayList<String> newBuffer = new ArrayList<>();
+			newBuffer.add("/~" + header);
+			for(String s : blockTextBuffer) {
+				newBuffer.add(s);
+			}
 			blockTextBuffer = newBuffer;
 			return true;
 		}
