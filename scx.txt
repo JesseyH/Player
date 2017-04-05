@@ -1,5 +1,0 @@
-/~set-voice:4
-/~repeat
-XA
-XV
-/~endrepeat
