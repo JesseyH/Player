@@ -161,7 +161,13 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 		buffer = Scenario.getBlockButtonBuffer();
 		
 		for (String s: buffer) {
-			if ((s.length() != 0) && !(s.equals("/~repeat-button:0"))  && !Scenario.isInMissing(s)) {
+			if ((s.length() != 0) && (!s.equals("/~repeat-button:0"))) {
+				s = s.split(" ", 2)[1];
+			} else {
+				s = "";
+			}
+			
+			if ((s.length() != 0)  && !Scenario.isInMissing(s)) {
 				Scenario.getMissingSections().add(new String[] { s });
 			}
 		}
