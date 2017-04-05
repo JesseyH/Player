@@ -24,6 +24,16 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+/**
+ * Editor view is where the entire application begins. The editor view is the main JFrame that contains
+ * the first JPanel which asks the user to enter braille cells, buttons, select a working directory and 
+ * enter a scenario file name.
+ * 
+ * Upon the user clicking the "Start editing" button, the EditorView JFrame replaces the main content JPanel 
+ * to the EditorPanel JPanel so that the user may begin editing the scenario file.
+ * @author Group 6
+ *
+ */
 @SuppressWarnings("serial")
 public class EditorView extends JFrame implements EditorViewController, FolderBrowserListener {
 
@@ -223,6 +233,10 @@ public class EditorView extends JFrame implements EditorViewController, FolderBr
 		selectedDirectoryText.setText(directory);
 	}
 	
+	/**
+	 * Makes the EditorView switch to the MainEditor JPanel in which
+	 * all scenario editing buttons are visible.
+	 */
 	@Override
 	public void switchToEditorScreen() {
 		setSize(1000, 500);
@@ -249,8 +263,8 @@ public class EditorView extends JFrame implements EditorViewController, FolderBr
 	}
 
 	/**
-	 * Shows a popup containing an error message.
-	 * @param errorMessage The error message to display
+	 * Called when an JDialog containing an error message should be displayed.
+	 * @param errorMessage The error message to display.
 	 */
 	@Override
 	public void showErrorMessage(String errorMessage) {
@@ -258,21 +272,36 @@ public class EditorView extends JFrame implements EditorViewController, FolderBr
                 JOptionPane.ERROR_MESSAGE);		
 	}
 
+	/**
+	 * Returns the text entered in the braille cells text area.
+	 * @return Text inside the braille cells text area.
+	 */
 	@Override
 	public String getBrailleCells() {
 		return brailleCellsText.getText();
 	}
 
+	/**
+	 * Returns the text entered in the button text area.
+	 * @return Text inside the buttons text area.
+	 */
 	@Override
 	public String getButtons() {
 		return buttonsText.getText();
 	}
 
+	/**
+	 * Method called when the user has selected a directory to write the 
+	 * scenario files to using the FolderBrowser.
+	 */
 	@Override
 	public void onSuccess(File file) {
 		setDirectoryText(file.toString());
 	}
 
+	/**
+	 * Method called when the user has closed the FolderBrowser.
+	 */
 	@Override
 	public void onFail() {		
 	}

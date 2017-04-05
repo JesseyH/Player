@@ -19,6 +19,12 @@ import javax.swing.border.TitledBorder;
 import main.core.BlockBuilderController;
 import main.core.Scenario;
 
+/**
+ * This is the JDialog that allows the user to enter text that will be synthesized
+ * to speech.
+ * @author Group 6
+ *
+ */
 @SuppressWarnings("serial")
 public class WriteTTS extends JDialog {
 	

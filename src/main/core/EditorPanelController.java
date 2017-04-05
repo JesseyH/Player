@@ -1,5 +1,11 @@
 package main.core;
 
+/**
+ * Interface that the EditorPanel class implements so that other objects
+ * can control the EditorPanel.
+ * @author Group 6
+ *
+ */
 public interface EditorPanelController {
 
 	/**

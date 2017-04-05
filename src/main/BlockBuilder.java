@@ -37,6 +37,12 @@ import javax.swing.JCheckBox;
 import java.awt.Toolkit;
 import javax.swing.DefaultComboBoxModel;
 
+/**
+ * BlockBuilder class defines the JDialog that appears when the user clicks "add section" on the main
+ * editor window.
+ * @author Group 6
+ *
+ */
 @SuppressWarnings("serial")
 public class BlockBuilder extends JDialog implements BlockBuilderController, FolderBrowserListener {
 	private EditorPanelController editorPanel;
@@ -353,22 +359,6 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 			}
 			
 		});
-		/*chckbxIsRepeatable.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent event) {
-				switch(event.getStateChange()) {
-				case 1: //When the checkbox is checked
-					waitForInput.setSelected(true);
-					JOptionPane.showMessageDialog(null, "Because you have chosen for this section to be replayable, button 0 and button 1 have\n"
-														+ "automatically been set to the 'replay' button and the 'continue' button respectively.\n"
-														+ "Any remaining buttons can be set to your liking.", "Auto Setup of Buttons",
-			                JOptionPane.INFORMATION_MESSAGE);	
-					break;
-				}
-			}
-			
-		});*/
 		panel_4.add(chckbxIsRepeatable);
 		
 		JPanel panel_9 = new JPanel();
@@ -396,6 +386,9 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 
 	}
 	
+	/**
+	 * Method that handles calling all necessary functions upon clicking the "finish section button".
+	 */
 	public void finishSection() {
 		ArrayList<String> buffer = Scenario.getBlockTextBuffer();
 		if(buffer.isEmpty()) {
@@ -452,6 +445,10 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
                 JOptionPane.ERROR_MESSAGE);		
 	}
 	
+	/**
+	 * Refresh the text area of the block builder that shows the current
+	 * scenario buffer text.
+	 */
 	@Override
 	public void refreshBuffer() {
 		buffer.setText("");

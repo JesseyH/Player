@@ -22,6 +22,13 @@ import main.core.Scenario;
 import javax.swing.UIManager;
 import java.awt.Color;
 
+/**
+ * EditorPanel interface is the JPanel that contains the "To Do List" JPanel,
+ * the current scenario file buffer JPanel, and the buttons to add a new section as well
+ * as save the scenario file.
+ * @author Group 6
+ *
+ */
 @SuppressWarnings("serial")
 public class EditorPanel extends JPanel implements EditorPanelController {
 	
@@ -127,6 +134,10 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 
 	}
 
+	/**
+	 * Refresh the text area of the main editor panel that shows the overall
+	 * scenario buffer text.
+	 */
 	@Override
 	public void refreshBuffer() {
 		ArrayList<String> buffer = Scenario.getScenarioBuffer();

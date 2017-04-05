@@ -22,6 +22,12 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+/**
+ * This is the JDialog that allows the user to enter text that will appear
+ * upon the device's braille cells.
+ * @author Budware
+ *
+ */
 @SuppressWarnings("serial")
 public class WriteToBraille extends JDialog {
 	

@@ -32,13 +32,21 @@ public interface EditorViewController {
 	 */
 	public String getScenarioFileDir();
 	
+	/**
+	 * Returns the text entered in the braille cells text area.
+	 * @return Text inside the braille cells text area.
+	 */
 	public String getBrailleCells();
 	
+	/**
+	 * Returns the text entered in the button text area.
+	 * @return Text inside the buttons text area.
+	 */
 	public String getButtons();
 	
 	/**
-	 * Called when an popup containing an error message should be displayed.
-	 * @param errorMessage The error message to display
+	 * Called when an JDialog containing an error message should be displayed.
+	 * @param errorMessage The error message to display.
 	 */
 	public void showErrorMessage(String errorMessage);
 	

@@ -23,6 +23,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
+/**
+ * This is the SoundRecorder JDialog. This dialog allows the user to record sound from
+ * their computer's microphone.
+ * @author Group 6
+ *
+ */
 @SuppressWarnings("serial")
 public class SoundRecorder extends JDialog {
 
