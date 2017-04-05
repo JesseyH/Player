@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -12,19 +11,17 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import main.core.BlockBuilderController;
 import main.core.Scenario;
 
+@SuppressWarnings("serial")
 public class WriteTTS extends JDialog {
-
-	private BlockBuilderController blockBuilder;
+	
 	private JTextField text;
 
 	/**
@@ -44,7 +41,6 @@ public class WriteTTS extends JDialog {
 	 * Create the dialog.
 	 */
 	public WriteTTS(BlockBuilderController blockBuilder) {
-		this.blockBuilder = blockBuilder;
 		setTitle("Write Text To Be Spoke");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(WriteToBraille.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 306, 146);

@@ -1,12 +1,9 @@
 package main;
 
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
 import javax.swing.JTextField;
-import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
@@ -14,8 +11,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import main.core.BlockBuilderController;
 import main.core.EditorPanelController;
@@ -25,9 +20,6 @@ import main.core.Scenario;
 import javax.swing.UIManager;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -40,12 +32,12 @@ import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 
-import java.awt.Dimension;
 import javax.swing.JScrollPane;
 import javax.swing.JCheckBox;
 import java.awt.Toolkit;
 import javax.swing.DefaultComboBoxModel;
 
+@SuppressWarnings("serial")
 public class BlockBuilder extends JDialog implements BlockBuilderController, FolderBrowserListener {
 	private EditorPanelController editorPanel;
 	private JTextField sectionName;
@@ -171,8 +163,8 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 		JLabel lblChooseVoice = new JLabel("Choose Voice");
 		panel_4.add(lblChooseVoice);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"male 1", "female", "male 2", "male 3"}));
+		JComboBox<String> comboBox = new JComboBox<>();
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"male 1", "female", "male 2", "male 3"}));
 		panel_4.add(comboBox);
 		panel_4.add(btnWriteToBrai);
 		
@@ -480,7 +472,6 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 	}
 	@Override
 	public void onFail() {
-		// TODO Auto-generated method stub
 		
 	}
 }

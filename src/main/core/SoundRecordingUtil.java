@@ -1,4 +1,4 @@
-package main;
+package main.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

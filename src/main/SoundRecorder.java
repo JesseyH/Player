@@ -11,21 +11,21 @@ import javax.swing.border.EmptyBorder;
 
 import main.core.BlockBuilderController;
 import main.core.Scenario;
+import main.core.SoundRecordingUtil;
 
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
+@SuppressWarnings("serial")
 public class SoundRecorder extends JDialog {
 
-	private BlockBuilderController blockBuilder;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField soundFileName;
 	
@@ -61,7 +61,6 @@ public class SoundRecorder extends JDialog {
 	 * Create the dialog.
 	 */
 	public SoundRecorder(BlockBuilderController blockBuilder) {
-		this.blockBuilder = blockBuilder;
 		setTitle("Sound Recorder");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SoundRecorder.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 450, 300);
@@ -140,7 +139,6 @@ public class SoundRecorder extends JDialog {
 									Scenario.bufferWriteSound(soundFile);
 									blockBuilder.refreshBuffer();
 								} catch (IOException e1) {
-									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
 								dispose();

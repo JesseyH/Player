@@ -1,13 +1,10 @@
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.GridBagLayout;
@@ -25,9 +22,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class WriteToBraille extends JDialog {
-	
-	private BlockBuilderController blockBuilder;
 	
 	private JTextField brailleText;
 
@@ -48,7 +44,6 @@ public class WriteToBraille extends JDialog {
 	 * Create the dialog.
 	 */
 	public WriteToBraille(BlockBuilderController blockBuilder) {
-		this.blockBuilder = blockBuilder;
 		setTitle("Write To Braille Cells");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(WriteToBraille.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 306, 146);

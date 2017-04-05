@@ -1,12 +1,10 @@
 package main;
 
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import java.awt.GridBagLayout;
@@ -24,6 +22,7 @@ import main.core.Scenario;
 import javax.swing.UIManager;
 import java.awt.Color;
 
+@SuppressWarnings("serial")
 public class EditorPanel extends JPanel implements EditorPanelController {
 	
 	private JTextArea scenarioBufferText;

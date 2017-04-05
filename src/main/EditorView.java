@@ -1,35 +1,31 @@
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import main.actionhandlers.CreateNew;
-import main.actionhandlers.EditExisting;
-import main.actionhandlers.StartEditing;
 import main.core.EditorViewController;
+import main.core.FolderBrowserListener;
+import main.core.Scenario;
 
 import java.awt.CardLayout;
-import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
-import javax.swing.BoxLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.SpringLayout;
 
-public class EditorView extends JFrame implements EditorViewController {
+@SuppressWarnings("serial")
+public class EditorView extends JFrame implements EditorViewController, FolderBrowserListener {
 
 	private JPanel contentPane;
 	private JTextField scenarioFileName;
@@ -106,7 +102,15 @@ public class EditorView extends JFrame implements EditorViewController {
 		initialPanel.add(selectDirectoryLabel, gbc_selectDirectoryLabel);
 		
 		JButton selectDirectoryBtn = new JButton("Select Directory");
-		selectDirectoryBtn.addActionListener(new CreateNew(this));
+		selectDirectoryBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new FolderBrowser(EditorView.this, EditorView.this, false);
+				
+			}
+			
+		});
 		GridBagConstraints gbc_selectDirectoryBtn = new GridBagConstraints();
 		gbc_selectDirectoryBtn.fill = GridBagConstraints.BOTH;
 		gbc_selectDirectoryBtn.insets = new Insets(0, 0, 5, 0);
@@ -137,7 +141,32 @@ public class EditorView extends JFrame implements EditorViewController {
 		
 		JButton btnStart = new JButton("Start Editing");
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		btnStart.addActionListener(new StartEditing(this));
+		btnStart.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				if(getScenarioFileName().length() == 0) {
+					showErrorMessage("Please enter the name of the new scenario file!");
+				} else if (getScenarioFileDir().equals("No Directory Selected...") || getScenarioFileDir().equals("")) {
+					showErrorMessage("Please select a directory to save the scenario file to!");
+				} else {
+					try {
+						int brailleCells = Integer.parseInt(getBrailleCells());
+						int buttons = Integer.parseInt(getButtons());
+						if(buttons < 2) {
+							showErrorMessage("A minimum of two buttons must be used!");
+						} else {
+							Scenario.initialize(getScenarioFileName(), getScenarioFileDir(), brailleCells, buttons);
+							switchToEditorScreen();
+						}
+					} catch (NumberFormatException e) {
+						showErrorMessage("Only enter numbers for the number of braille cells and buttons!");
+					}
+					
+				}				
+			}
+			
+		});
 		
 		JLabel lblEnterNumber = new JLabel("3) Enter number of braille cells:");
 		lblEnterNumber.setFont(new Font("Tahoma", Font.PLAIN, 18));
@@ -237,5 +266,14 @@ public class EditorView extends JFrame implements EditorViewController {
 	@Override
 	public String getButtons() {
 		return buttonsText.getText();
+	}
+
+	@Override
+	public void onSuccess(File file) {
+		setDirectoryText(file.toString());
+	}
+
+	@Override
+	public void onFail() {		
 	}
 }
