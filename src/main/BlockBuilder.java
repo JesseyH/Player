@@ -452,7 +452,8 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 			tempBuffer += Scenario.getBlockTextBuffer().get(i) + "\n";
 		}
 		for(String s: Scenario.getBlockButtonBuffer()) {
-			tempBuffer += s + "\n";
+			if(s.length() != 0)
+				tempBuffer += s + "\n";
 		}
 		buffer.setText(tempBuffer);
 	}

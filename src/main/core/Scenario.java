@@ -202,6 +202,9 @@ public class Scenario {
 	public static boolean clearBlockButtonBuffer() {
 		if(blockButtonBuffer != null) {
 			blockButtonBuffer.clear();
+			for(int i = 0; i < buttons; i ++) {
+				blockButtonBuffer.add("");
+			}
 			return true;
 		}
 		return false;
@@ -219,6 +222,7 @@ public class Scenario {
 		if(blockButtonBuffer.size() > 0) { 	//if there is button actions
 			scenarioBuffer.add("/~reset-buttons"); //reset all buttons first
 			for (String j : blockButtonBuffer) {	// Loop through all button options
+				if(j.length() != 0)
 				scenarioBuffer.add(j);
 			}
 			scenarioBuffer.add("/~user-input"); // end the user input section
