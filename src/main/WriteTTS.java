@@ -19,10 +19,12 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import main.core.BlockBuilderController;
 import main.core.Scenario;
 
 public class WriteTTS extends JDialog {
 
+	private BlockBuilderController blockBuilder;
 	private JTextField text;
 
 	/**
@@ -30,7 +32,7 @@ public class WriteTTS extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			WriteTTS dialog = new WriteTTS();
+			WriteTTS dialog = new WriteTTS(null);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -41,7 +43,8 @@ public class WriteTTS extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public WriteTTS() {
+	public WriteTTS(BlockBuilderController blockBuilder) {
+		this.blockBuilder = blockBuilder;
 		setTitle("Write Text To Be Spoke");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(WriteToBraille.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 306, 146);
@@ -89,7 +92,8 @@ public class WriteTTS extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-							Scenario.getBlockTextBuffer().add(text.getText());
+							Scenario.bufferWriteTTS(text.getText());
+							blockBuilder.refreshBuffer();
 							dispose();
 					}
 				});

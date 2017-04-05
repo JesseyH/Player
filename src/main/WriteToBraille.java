@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import javax.swing.border.TitledBorder;
 
+import main.core.BlockBuilderController;
 import main.core.Scenario;
 
 import javax.swing.UIManager;
@@ -25,6 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class WriteToBraille extends JDialog {
+	
+	private BlockBuilderController blockBuilder;
+	
 	private JTextField brailleText;
 
 	/**
@@ -32,7 +36,7 @@ public class WriteToBraille extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			WriteToBraille dialog = new WriteToBraille();
+			WriteToBraille dialog = new WriteToBraille(null);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -43,7 +47,8 @@ public class WriteToBraille extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public WriteToBraille() {
+	public WriteToBraille(BlockBuilderController blockBuilder) {
+		this.blockBuilder = blockBuilder;
 		setTitle("Write To Braille Cells");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(WriteToBraille.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 306, 146);
@@ -95,7 +100,8 @@ public class WriteToBraille extends JDialog {
 							JOptionPane.showMessageDialog(null, "You can only enter up to "+Scenario.getBrailleCells()+" chracters.", "Character Limit Exceeded",
 					                JOptionPane.ERROR_MESSAGE);
 						} else {
-							Scenario.getBlockTextBuffer().add("/~disp-string:" + brailleText.getText());
+							Scenario.bufferWriteBraille(brailleText.getText());
+							blockBuilder.refreshBuffer();
 							dispose();
 						}
 					}

@@ -14,15 +14,19 @@ import java.awt.GridBagConstraints;
 import javax.swing.JTextArea;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.border.TitledBorder;
 
+import main.core.EditorPanelController;
 import main.core.Scenario;
 
 import javax.swing.UIManager;
 import java.awt.Color;
 
-public class EditorPanel extends JPanel {
+public class EditorPanel extends JPanel implements EditorPanelController {
+	
+	private JTextArea scenarioBufferText;
 	private JTable table;
 
 	/**
@@ -83,26 +87,55 @@ public class EditorPanel extends JPanel {
 		gbc_scrollPane_1.gridy = 0;
 		panel_1.add(scrollPane_1, gbc_scrollPane_1);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		scrollPane_1.setViewportView(textArea);
+		scenarioBufferText = new JTextArea();
+		scenarioBufferText.setEditable(false);
+		scrollPane_1.setViewportView(scenarioBufferText);
 		
-		JButton btnNewButton = new JButton("Add Block");
-		btnNewButton.addActionListener(new ActionListener() {
+		JButton addNewSection = new JButton("Add New Section");
+		addNewSection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Scenario.getBlockButtonBuffer().clear();
-				Scenario.getBlockTextBuffer().clear();
-				JDialog blockBuilder = new BlockBuilder();
-				blockBuilder.setSize(1000, 400);
+				Scenario.clearBlockTextBuffer();
+				Scenario.clearBlockButtonBuffer();
+				JDialog blockBuilder = new BlockBuilder(EditorPanel.this);
+				blockBuilder.setSize(1000, 500);
 				blockBuilder.setVisible(true);
 			}
 		});
-		GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-		gbc_btnNewButton.gridwidth = 2;
-		gbc_btnNewButton.gridx = 0;
-		gbc_btnNewButton.gridy = 1;
-		add(btnNewButton, gbc_btnNewButton);
+		GridBagConstraints gbc_addNewSection = new GridBagConstraints();
+		gbc_addNewSection.insets = new Insets(0, 0, 0, 5);
+		gbc_addNewSection.anchor = GridBagConstraints.EAST;
+		gbc_addNewSection.gridx = 0;
+		gbc_addNewSection.gridy = 1;
+		add(addNewSection, gbc_addNewSection);
+		
+		JButton saveScenario = new JButton("Save Scenario");
+		saveScenario.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(Scenario.saveScenarioToFile()) {
+					JOptionPane.showMessageDialog(null, "Scenario has been saved to the text file!", "Scenario Saved",
+			                JOptionPane.INFORMATION_MESSAGE);	
+				} else {
+					JOptionPane.showMessageDialog(null, "There is no scenario to save!", "No Scenario",
+			                JOptionPane.ERROR_MESSAGE);	
+				}
+			}
+		});
+		GridBagConstraints gbc_saveScenario = new GridBagConstraints();
+		gbc_saveScenario.anchor = GridBagConstraints.WEST;
+		gbc_saveScenario.gridx = 1;
+		gbc_saveScenario.gridy = 1;
+		add(saveScenario, gbc_saveScenario);
 
+	}
+
+	@Override
+	public void refreshBuffer() {
+		ArrayList<String> buffer = Scenario.getScenarioBuffer();
+		String temp = "";
+		for (String s : buffer) {
+			temp += s + "\n";
+		}
+		scenarioBufferText.setText(temp);
 	}
 
 }

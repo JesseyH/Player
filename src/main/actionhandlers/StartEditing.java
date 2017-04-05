@@ -30,8 +30,12 @@ public class StartEditing implements ActionListener {
 			try {
 				int brailleCells = Integer.parseInt(view.getBrailleCells());
 				int buttons = Integer.parseInt(view.getButtons());
-				Scenario.initialize(view.getScenarioFileName(), view.getScenarioFileDir(), brailleCells, buttons);
-				view.switchToEditorScreen();
+				if(buttons < 2) {
+					view.showErrorMessage("A minimum of two buttons must be used!");
+				} else {
+					Scenario.initialize(view.getScenarioFileName(), view.getScenarioFileDir(), brailleCells, buttons);
+					view.switchToEditorScreen();
+				}
 			} catch (NumberFormatException e) {
 				view.showErrorMessage("Only enter numbers for the number of braille cells and buttons!");
 			}

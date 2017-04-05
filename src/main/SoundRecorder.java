@@ -8,6 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import main.core.BlockBuilderController;
+import main.core.Scenario;
+
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +25,7 @@ import javax.swing.JTextArea;
 
 public class SoundRecorder extends JDialog {
 
+	private BlockBuilderController blockBuilder;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField soundFileName;
 	
@@ -44,7 +49,7 @@ public class SoundRecorder extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			SoundRecorder dialog = new SoundRecorder();
+			SoundRecorder dialog = new SoundRecorder(null);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -55,7 +60,8 @@ public class SoundRecorder extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public SoundRecorder() {
+	public SoundRecorder(BlockBuilderController blockBuilder) {
+		this.blockBuilder = blockBuilder;
 		setTitle("Sound Recorder");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(SoundRecorder.class.getResource("/main/icon.png")));
 		setBounds(100, 100, 450, 300);
@@ -127,10 +133,12 @@ public class SoundRecorder extends JDialog {
 								JOptionPane.showMessageDialog(null, "Please enter a file name before recording!", "No File Name",
 						                JOptionPane.ERROR_MESSAGE);		
 							} else {
-								File wavFile = new File("C:/Users/Budware/Desktop/"+soundFileName.getText()+".wav");
-								
+								String soundFile = soundFileName.getText()+".wav";
+								File wavFile = new File(Scenario.getDirectory() + "\\" + Scenario.getFileName() + "\\AudioFiles\\" + soundFile);
 								try {
 									recorder.save(wavFile);
+									Scenario.bufferWriteSound(soundFile);
+									blockBuilder.refreshBuffer();
 								} catch (IOException e1) {
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
@@ -149,6 +157,11 @@ public class SoundRecorder extends JDialog {
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						dispose();
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}

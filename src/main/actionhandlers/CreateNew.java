@@ -26,7 +26,7 @@ public class CreateNew implements ActionListener, FolderBrowserListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		FolderBrowser folderBrowser = new FolderBrowser((JFrame) view, this, false);
+		new FolderBrowser((JFrame) view, this, false);
 	}
 
 	@Override
