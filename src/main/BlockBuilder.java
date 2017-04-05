@@ -406,7 +406,7 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 					Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);	// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
 					Scenario.bufferWriteSectionHeader(sectionName.getText());	//Third we add the section header to the top of the current buffer
 					Scenario.copyBlockBuffersToScenarioBuffer();				//Finally we copy the current buffer to the scenario buffer.
-					editorPanel.refreshBuffer();
+					editorPanel.refreshBuffer(skipToSectionName.getText());
 					dispose();
 				}
 			//If wait for user input is selected
@@ -419,7 +419,7 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 						Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);		// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
 						Scenario.bufferWriteSectionHeader(sectionName.getText());	//Third, we add the section header to the top of the current buffer
 						Scenario.copyBlockBuffersToScenarioBuffer();				//Finally we copy the current buffer to the scenario buffer.
-						editorPanel.refreshBuffer();								
+						editorPanel.refreshBuffer(null);								
 						dispose();
 					} else {
 						showError("Because this section is repeatable, you must assign atleast one button\n"
@@ -430,7 +430,7 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 					Scenario.bufferWriteVoice(voice.getSelectedIndex() + 1);		// Add 1 to the currently selected voice due to the fact that drop downs start at index 0.
 					Scenario.bufferWriteSectionHeader(sectionName.getText());	// Second, we write the section header to the top of the current buffer
 					Scenario.copyBlockBuffersToScenarioBuffer();				// Finally we copy the current buffer to the scenario buffer.
-					editorPanel.refreshBuffer();
+					editorPanel.refreshBuffer(null);
 					dispose();
 				}
 				
