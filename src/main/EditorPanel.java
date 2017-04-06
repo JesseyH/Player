@@ -97,6 +97,7 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 						blockBuilder.setSize(1000, 500);
 						blockBuilder.setVisible(true);
 						//Trying to change the value of sectionName in BlockBuilder here 
+						
 					}
 				}
 			}

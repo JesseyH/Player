@@ -46,7 +46,7 @@ import javax.swing.DefaultComboBoxModel;
 @SuppressWarnings("serial")
 public class BlockBuilder extends JDialog implements BlockBuilderController, FolderBrowserListener {
 	private EditorPanelController editorPanel;
-	public JTextField sectionName;
+	private JTextField sectionName;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JCheckBox chckbxIsRepeatable;
 	private JRadioButton skipToSection;
