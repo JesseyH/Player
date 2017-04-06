@@ -127,7 +127,11 @@ public class Scenario {
 	public static int getButtons() {
 		return buttons;
 	}
-	
+
+	/**
+	 * Returns the name of the last created section (the section's header).
+	 * @return The header of the last created section.
+	 */
 	public static String getHeader() {
 		return header;
 	}
