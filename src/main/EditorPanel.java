@@ -93,11 +93,11 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 					if (row == 0) {
 						Scenario.clearBlockTextBuffer();
 						Scenario.clearBlockButtonBuffer();
-						JDialog blockBuilder = new BlockBuilder(EditorPanel.this);
+						BlockBuilder blockBuilder = new BlockBuilder(EditorPanel.this);
 						blockBuilder.setSize(1000, 500);
 						blockBuilder.setVisible(true);
-						//Trying to change the value of sectionName in BlockBuilder here 
-						
+						blockBuilder.getSectionName().setText((String) table.getValueAt(0, 0)); 
+						blockBuilder.getSectionName().setEditable(false);
 					}
 				}
 			}
@@ -219,6 +219,10 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 			for (String[] s : Scenario.getMissingSections()) {
 				table.addRow(s);
 			}
+		}
+		
+		if (Scenario.getHeader().equals(Scenario.getMissingSections().get(0)[0])) {
+			table.removeRow(0);
 		}
 	}
 

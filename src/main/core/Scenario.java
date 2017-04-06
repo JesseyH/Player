@@ -31,6 +31,7 @@ public class Scenario {
 	private static int brailleCells;
 	private static int buttons;
 	
+	private static String header;
 	private static ArrayList<String> scenarioBuffer;
 	private static ArrayList<String> blockTextBuffer;
 	private static ArrayList<String> blockButtonBuffer; 
@@ -109,6 +110,10 @@ public class Scenario {
 	 */
 	public static int getButtons() {
 		return buttons;
+	}
+	
+	public static String getHeader() {
+		return header;
 	}
 	
 	/**
@@ -216,6 +221,7 @@ public class Scenario {
 	 * @return True if the section was succesfully written to the top of the blockTextBuffer.
 	 */
 	public static boolean bufferWriteSectionHeader(String header) {
+		Scenario.header = header;
 		if(blockTextBuffer != null) {
 			ArrayList<String> newBuffer = new ArrayList<>();
 			newBuffer.add("/~" + header);

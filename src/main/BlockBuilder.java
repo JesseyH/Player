@@ -481,4 +481,8 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 	public void onFail() {
 		
 	}
+	
+	public JTextField getSectionName(){
+		return sectionName;
+	}
 }
