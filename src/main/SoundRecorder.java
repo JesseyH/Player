@@ -38,6 +38,7 @@ public class SoundRecorder extends JDialog {
 	private int recordingTimes = 0;
 	private boolean recording = false;
 	final SoundRecordingUtil recorder = new SoundRecordingUtil();
+	
 	private Thread recordThread = new Thread(new Runnable() {
         @Override
         public void run() {
