@@ -1,5 +1,7 @@
 package main.core;
 
+import javax.swing.JTextField;
+
 /**
  * Interface that the BlockBuilder class implements so that other objects
  * can control the BlockBuilder.

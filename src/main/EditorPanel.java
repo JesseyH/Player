@@ -12,6 +12,8 @@ import java.awt.GridBagConstraints;
 import javax.swing.JTextArea;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.border.TitledBorder;
@@ -22,6 +24,7 @@ import main.core.Scenario;
 
 import javax.swing.UIManager;
 import java.awt.Color;
+import javax.swing.ListSelectionModel;
 
 /**
  * EditorPanel interface is the JPanel that contains the "To Do List" JPanel,
@@ -75,7 +78,30 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 		gbc_scrollPane.gridy = 0;
 		panel.add(scrollPane, gbc_scrollPane);
 
-		toDoList = new JTable();
+		toDoList = new JTable(){
+	         public boolean editCellAt(int row, int column, java.util.EventObject e) {
+	             return false;
+	          }
+	       };
+		toDoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		toDoList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JTable target = (JTable) e.getSource();
+					int row = target.getSelectedRow();
+					if (row == 0) {
+						Scenario.clearBlockTextBuffer();
+						Scenario.clearBlockButtonBuffer();
+						JDialog blockBuilder = new BlockBuilder(EditorPanel.this);
+						blockBuilder.setSize(1000, 500);
+						blockBuilder.setVisible(true);
+						//Trying to change the value of sectionName in BlockBuilder here 
+					}
+				}
+			}
+		});
+		
 		toDoList.setModel(table);
 		scrollPane.setViewportView(toDoList);
 

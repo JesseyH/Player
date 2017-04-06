@@ -46,7 +46,7 @@ import javax.swing.DefaultComboBoxModel;
 @SuppressWarnings("serial")
 public class BlockBuilder extends JDialog implements BlockBuilderController, FolderBrowserListener {
 	private EditorPanelController editorPanel;
-	private JTextField sectionName;
+	public JTextField sectionName;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JCheckBox chckbxIsRepeatable;
 	private JRadioButton skipToSection;
@@ -476,6 +476,7 @@ public class BlockBuilder extends JDialog implements BlockBuilderController, Fol
 		Scenario.bufferWriteSound(file.getName());
 		refreshBuffer();
 	}
+
 	@Override
 	public void onFail() {
 		
