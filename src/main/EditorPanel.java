@@ -223,6 +223,7 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 		
 		if (Scenario.getHeader().equals(Scenario.getMissingSections().get(0)[0])) {
 			table.removeRow(0);
+			Scenario.getMissingSections().remove(0);
 		}
 	}
 
