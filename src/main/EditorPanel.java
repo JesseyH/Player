@@ -42,7 +42,7 @@ public class EditorPanel extends JPanel implements EditorPanelController {
 	// Contains the missing Sections that show up in the to do list
 	private DefaultTableModel table = new DefaultTableModel(new Object[][] {
 
-	}, new String[] { "Missing Sections" });
+	}, new String[] { "Missing Sections (Double-Click on first index to deal with section)" });
 
 	/**
 	 * Create the panel.
