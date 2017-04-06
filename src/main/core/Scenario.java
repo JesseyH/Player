@@ -60,6 +60,22 @@ public class Scenario {
 	}
 	
 	/**
+	 * Method to reset all variables in this class.
+	 * Used for testing.
+	 */
+	public static void reset() {
+		fileName = null;
+		directory = null;
+		brailleCells = -1;
+		buttons = -1;
+		header = null;
+		scenarioBuffer = null;
+		blockTextBuffer = null;
+		blockButtonBuffer = null;
+		missingSections = null;
+	}
+	
+	/**
 	 * Creates the scenario directory along with the AudioFiles sub directory
 	 * contained within the scenario directory.
 	 * @return True if the scenario directory was created.
