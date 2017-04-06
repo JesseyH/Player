@@ -12,10 +12,10 @@ The Authoring App created in java allows educator to create and customize scenar
 ## Prerequisite
 * [Java JRE](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 ## Starting Authoring App
-Double click authoring-app.jar; Authoring app will start in seconds.
+Double click `authoring-app.jar`; Authoring app will start in seconds.
   
 # Testing
-See test files under `/testing/` folder
+Please see `/src/test/ScenarioTest.java` file for test cases used for testing.
 
 # Contributor
 Harrymanoharan, Jessanth  
