@@ -9,13 +9,10 @@ The Authoring App created in java allows educator to create and customize scenar
 
 # How to run
 
-Import project into eclipse and run [recommended]
-
-Alternatively:
-
-Navigate to `/src/` folder and run commands:
-
-  `java Editor.java`, then `javac Editor`
+## Prerequisite
+* [Java JRE](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
+## Starting Authoring App
+Double click authoring-app.jar; Authoring app will start in seconds.
   
 # Testing
 See test files under `/testing/` folder
