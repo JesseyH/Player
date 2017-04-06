@@ -327,7 +327,14 @@ public class Scenario {
 		for(String s : blockTextBuffer) {
 			scenarioBuffer.add(s);
 		}
-		if(blockButtonBuffer.size() > 0) { 	//if there is button actions
+		boolean hasButtons = false;
+		for(String s: blockButtonBuffer) {
+			if(s.length() > 0) {
+				hasButtons = true;
+				break;
+			}
+		}
+		if(hasButtons) { 	//if there is button actions
 			scenarioBuffer.add("/~reset-buttons"); //reset all buttons first
 			for (String j : blockButtonBuffer) {	// Loop through all button options
 				if(j.length() != 0)
